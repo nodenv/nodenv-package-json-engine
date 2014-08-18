@@ -76,3 +76,23 @@ semver_ge()
 {
     semver_lt "$1" "$2" && return 1 || return 0
 }
+
+regex_match()
+{
+    local string="$1"
+    local regexp="$2"
+    local sed_re="$(eval "echo '$regexp' | sed 's/(/\\\(/g' | sed 's/)/\\\)/g'")"
+
+    if [ -z "$(eval "echo '$string' | sed --posix 's/$sed_re//'")" ]; then
+        for i in $(seq 0 3); do
+            local group="$(eval "echo '$string' | sed --posix 's/$sed_re/\\$i/'")"
+            eval "REGEX_MATCHED_GROUP_$i='$group'"
+        done
+        return 0
+    else
+        for i in $(seq 0 3); do
+            eval "REGEX_MATCHED_GROUP_$i=''"
+        done
+        return 1
+    fi
+}

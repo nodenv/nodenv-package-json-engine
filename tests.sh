@@ -109,6 +109,21 @@ describe 'semver_ge'
     semver_ge 1.2.4 1.2.3
     assert $? 0
 
+describe 'regex_match'
+    regex_match '1.2.3 - 5.6.7' '(.*) - (.*)'
+    assert $? 0
+    assert "$REGEX_MATCHED_GROUP_0" "1.2.3 - 5.6.7"
+    assert "$REGEX_MATCHED_GROUP_1" "1.2.3"
+    assert "$REGEX_MATCHED_GROUP_2" "5.6.7"
+    assert "$REGEX_MATCHED_GROUP_3" ""
+
+    regex_match '1.2.3 - 5.6.7' '5.6.7'
+    assert $? 1
+    assert "$REGEX_MATCHED_GROUP_0" ""
+    assert "$REGEX_MATCHED_GROUP_1" ""
+    assert "$REGEX_MATCHED_GROUP_2" ""
+    assert "$REGEX_MATCHED_GROUP_3" ""
+
 
 # Summary
 summary
