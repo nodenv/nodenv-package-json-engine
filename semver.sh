@@ -184,8 +184,6 @@ resolve_rule()
     # Tilde
     elif regex_match "$1" "~$RE_VER"; then
         echo "tilde $MATCHED_VER_1"
-    elif regex_match "$1" "$RE_NUM(\.[x*])+"; then
-        echo "tilde $MATCHED_NUM_1"
 
     # Caret
     elif regex_match "$1" "\^$RE_VER"; then
@@ -262,22 +260,27 @@ rule_ge_le()
 
 rule_tilde()
 {
-    ver1=$(get_version "$1")
-    maj2=$(get_major "$2")
-    min2=$(get_minor "$2")
+    num=$(get_version "$1")
+    maj=$(get_major "$1")
+    min=$(get_minor "$1")
 
-    if semver_ge "$3" "$maj2"".$min2"".0-0" && semver_le; then
+    if semver_ge "$2" "$num-0" && semver_le "$2" "$maj"".$(( $min + 1 )).0-0"; then
         return 0
     else
         return 1
     fi
 }
+if [ $# -eq 0 ]; then
+    echo "Usage:    $0 -r <rule> <version> [<version>... ]"
+fi
 
-while getopts r: o; do
+while getopts r:h o; do
     case "$o" in
-        r) rule="rule_$(resolve_rule $OPTARG)";;
+        r) rule="rule_$(resolve_rule "$OPTARG")";;
+        h|?) echo "Usage:    $0 -r <rule> <version> [<version>... ]"
     esac
 done
+
 
 shift $(( $OPTIND-1 ))
 
