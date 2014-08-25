@@ -7,7 +7,7 @@ _met_part='([0-9A-Za-z-]+)'
 RE_NUM="$_num_part(\.$_num_part)*"
 RE_LAB="$_lab_part(\.$_lab_part)*"
 RE_MET="$_met_part(\.$_met_part)*"
-RE_VER="$RE_NUM(-$RE_LAB)?(\+$RE_MET)?"
+RE_VER="[ \t]*$RE_NUM(-$RE_LAB)?(\+$RE_MET)?"
 
 
 get_version()
@@ -116,8 +116,7 @@ regex_match()
 {
     local string="$1"
     local regexp="$2"
-    local bre="$(eval "echo '$regexp' | sed 's/\\([(){}]\\)/\\\\\\1/g'")"
-    local match="$(eval "echo '$string' | grep -E -x '$regexp'")";
+    local match="$(eval "echo '$string' | grep -E -x '[ \t]*$regexp[ \t]*'")";
 
     for i in $(seq 0 9); do
         unset "MATCHED_VER_$i"
@@ -132,7 +131,7 @@ regex_match()
     local part
     local i=1
     for part in $(echo $string); do
-        local ver="$(eval "echo '$part' | grep -E -o '$RE_VER'   | head -n 1 ")";
+        local ver="$(eval "echo '$part' | grep -E -o '$RE_VER'   | head -n 1 | sed 's/ \t//g'")";
         local num="$(eval "echo '$part' | grep -E -o '$RE_NUM'   | head -n 1 ")";
         local lab="$(eval "echo '$part' | grep -E -o '\-$RE_LAB' | cut -c 2- ")";
 
@@ -186,8 +185,8 @@ resolve_rule()
         echo "tilde $MATCHED_VER_1"
 
     # Caret
-    elif regex_match "$1" "\^$RE_VER"; then
-        echo "caret $MATCHED_VER_1"
+    # elif regex_match "$1" "\^$RE_VER"; then
+    #     echo "caret $MATCHED_VER_1"
 
     else
         return 1
@@ -281,10 +280,17 @@ while getopts r:h o; do
     esac
 done
 
+if [ "$rule" = "rule_" ]; then
+    exit
+fi
 
 shift $(( $OPTIND-1 ))
 
 for ver in $@; do
+    if [ -z `echo "$ver" | grep -E -x "[v=]?[ \t]*$RE_VER"` ]; then
+        continue
+    fi
+    ver=`echo "$ver" | grep -E -x "$RE_VER"`
     if [ -z "$rule" ] || $rule "$ver"; then
         if semver_lt "$max" "$ver"; then
             max="$ver"
