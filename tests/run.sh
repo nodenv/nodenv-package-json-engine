@@ -2,13 +2,13 @@
 
 # Tools
 
+OK_COUNT=0
+FAIL_COUNT=0
+
 describe()
 {
     if [ -n "$CURRENT_SECTION" ]; then
         printf "\n"
-    else
-        OK_COUNT=0
-        FAIL_COUNT=0
     fi
 
     CURRENT_SECTION="$1"

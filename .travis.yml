@@ -1,0 +1,3 @@
+language: sh
+script:
+    - ./tests/run.sh

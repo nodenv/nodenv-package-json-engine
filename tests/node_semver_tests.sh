@@ -5,7 +5,15 @@
 
 describe 'Positive range tests'
 
-echo "
+while read -r line; do
+    parts=$(echo "$line" | grep -E -o "'[^']+'")
+    if [ $(echo "$parts" | wc -l) = "2" ]; then
+        rule=$(echo "$parts" | head -n1 | cut -d "'" -f 2)
+        ver=$(echo "$parts" | tail -n1 | cut -d "'" -f 2)
+        ret=$(eval "./semver.sh -r '$rule' '$ver'")
+        assert "$ret" "$ver" "$ver should match the range $rule"
+    fi
+done <<EOF
 ['1.0.0 - 2.0.0', '1.2.3'],
 ['1.0.0', '1.0.0'],
 ['>=*', '0.2.4'],
@@ -93,21 +101,21 @@ echo "
 ['^1.2 ^1', '1.4.2'],
 ['^1.2', '1.2.0-pre'],
 ['^1.2.3', '1.2.3-pre']
-" | while read -r line; do
-    parts=$(echo "$line" | grep -E -o "'[^']+'")
-    if [ $(echo "$parts" | wc -l) = "2" ]; then
-        rule=$(echo "$parts" | head -n1 | cut -d "'" -f 2)
-        ver=$(echo "$parts" | tail -n1 | cut -d "'" -f 2)
-        ret=$(eval "./semver.sh -r '$rule' '$ver'")
-        assert "$ret" "$ver" "$ver should match the range $rule"
-    fi
-done
+EOF
 
 
 
 describe "Negative range tests"
 
-echo "
+while read -r line; do
+    parts=$(echo "$line" | grep -E -o "'[^']+'")
+    if [ $(echo "$parts" | wc -l) = "2" ]; then
+        rule=$(echo "$parts" | head -n1 | cut -d "'" -f 2)
+        ver=$(echo "$parts" | tail -n1 | cut -d "'" -f 2)
+        ret=$(eval "./semver.sh -r '$rule' '$ver'")
+        assert "$ret" "" "$ver should not match the range $rule"
+    fi
+done <<EOF
 ['1.0.0 - 2.0.0', '2.2.3'],
 ['1.0.0', '1.0.1'],
 ['>=1.0.0', '0.0.0'],
@@ -163,12 +171,4 @@ echo "
 ['blerg', '1.2.3'],
 ['git+https://user:password0123@github.com/foo', '123.0.0', true],
 ['^1.2.3', '2.0.0-pre']
-" | while read -r line; do
-    parts=$(echo "$line" | grep -E -o "'[^']+'")
-    if [ $(echo "$parts" | wc -l) = "2" ]; then
-        rule=$(echo "$parts" | head -n1 | cut -d "'" -f 2)
-        ver=$(echo "$parts" | tail -n1 | cut -d "'" -f 2)
-        ret=$(eval "./semver.sh -r '$rule' '$ver'")
-        assert "$ret" "" "$ver should not match the range $rule"
-    fi
-done
+EOF
