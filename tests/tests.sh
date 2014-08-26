@@ -1,10 +1,38 @@
-describe 'get_version'
-    RET=$(get_version 1.2.3.4-1.2.3.4.a.b.c-def)
+describe 'get_number'
+    RET=$(get_number '1.2.3.4-0')
     assert "$RET" "1.2.3.4"
 
+    RET=$(get_number 'v 0.01.002.0003-0')
+    assert "$RET" "0.1.2.3"
+
+    RET=$(get_number '= 4.5.09beta')
+    assert "$RET" "4.5.9"
+
+    RET=$(get_number 'v1.2.3-abc.009.00a+meta')
+    assert "$RET" "1.2.3"
+
 describe 'get_labels'
-    RET=$(get_labels 1.2.3.4-1.2.3.4.a.b.c-def)
+    RET=$(get_labels '1.2.3')
+    assert "$RET" ""
+
+    RET=$(get_labels 'v1.2.3')
+    assert "$RET" ""
+
+    RET=$(get_labels '1.2.3.4-1.2.3.4.a.b.c-def')
     assert "$RET" "1.2.3.4.a.b.c-def"
+
+    RET=$(get_labels 'v1.2.3-abc.009.00a+meta')
+    assert "$RET" "abc.9.00a"
+
+    RET=$(get_labels '=4.5.09beta')
+    assert "$RET" "beta"
+
+describe 'get_metadata'
+    RET=$(get_metadata '1.2.3.4-0')
+    assert "$RET" ""
+
+    RET=$(get_metadata 'v1.2.3-abc.009.00a+meta')
+    assert "$RET" "meta"
 
 describe 'get_major'
     RET=$(get_major 1.2.3.4)
@@ -15,6 +43,13 @@ describe 'get_minor'
     assert "$RET" "2"
 
     RET=$(get_minor 1)
+    assert "$RET" "0"
+
+describe 'get_bugfix'
+    RET=$(get_bugfix 1.2.3.4)
+    assert "$RET" "3"
+
+    RET=$(get_bugfix 1)
     assert "$RET" "0"
 
 describe 'semver_eq'
@@ -71,14 +106,11 @@ describe 'regex_match'
     assert "$MATCHED_VER_2" "1.2.3-3.2.1-a.b.c-def+011.a.1" "Should set MATCHED_VER_2"
     assert "$MATCHED_NUM_1" "1.22.333"                      "Should set MATCHED_NUM_1"
     assert "$MATCHED_NUM_2" "1.2.3"                         "Should set MATCHED_NUM_2"
-    assert "$MATCHED_LAB_1" ""                              "Should set MATCHED_LAB_1"
-    assert "$MATCHED_LAB_2" "3.2.1-a.b.c-def"               "Should set MATCHED_LAB_2"
 
     regex_match '1.2.3 - 5.6.7' '5.6.7'
     assert $? 1                                             "Exit code should be 1 when don't match"
     assert "$MATCHED_VER_1" ""                              "When don't match MATCHED_VER_x should be empty"
     assert "$MATCHED_VER_1" ""                              "When don't match MATCHED_NUM_x should be empty"
-    assert "$MATCHED_LAB_1" ""                              "When don't match MATCHED_LAB_x should be empty"
 
 describe 'reslove_rule'
     RET=$(resolve_rule 'v1.2.3')
@@ -88,13 +120,13 @@ describe 'reslove_rule'
     assert "$RET" "eq 1"                                    "Specific (1)"
 
     RET=$(resolve_rule '=1.2.3-a.2-c')
-    assert "$RET" "eq 1.2.3-a.2-c"                          "Specific (=1.2.3-a.2-c)"
+    assert "$RET" "eq 1.2.3"                                "Specific (=1.2.3-a.2-c)"
 
     RET=$(resolve_rule '>1.2.3')
     assert "$RET" "gt 1.2.3"                                "Greater than (>1.2.3)"
 
     RET=$(resolve_rule '<1.2.3')
-    assert "$RET" "lt 1.2.3"                                "Less than (<1.2.3)"
+    assert "$RET" "lt 1.2.3-0"                              "Less than (<1.2.3)"
 
     RET=$(resolve_rule '>=1.2.3')
     assert "$RET" "ge 1.2.3"                                "Greater than or equal to (>=1.2.3)"

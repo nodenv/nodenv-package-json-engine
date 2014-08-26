@@ -9,35 +9,88 @@ RE_LAB="$_lab_part(\.$_lab_part)*"
 RE_MET="$_met_part(\.$_met_part)*"
 RE_VER="[ \t]*$RE_NUM(-$RE_LAB)?(\+$RE_MET)?"
 
+filter()
+{
+    local text="$1"
+    local regex="$2"
+    shift 2
+    echo "$text" | grep -E $@ "$regex"
+}
 
 get_version()
 {
-    echo -n ${1%%-*}
+    echo -n "$(get_number "$1")-$(get_labels "$1")+$(get_metadata "$1")"
+}
+
+get_number()
+{
+    local num=$(echo "$1" | grep -E -o "[0-9]+(\.[0-9]+)*" | head -n1)
+
+    local out
+    for part in `echo "$num" | sed 's/\./ /g'`; do
+        out="${out}.$(echo $part | grep -E -o '(0|[1-9]+)$')"
+    done
+
+    echo -n "$out" | cut -c 2-
 }
 
 get_labels()
 {
-    local labels=${1#*-}
-    if [ "$labels" != "$1" ]; then
-        echo -n "$labels"
+    # Skip leading "=" or "v". Especially "v" it breaks finding labels without "-" separator.
+    local ver=$(echo "$1" | grep -E -o "[0-9].*")
+
+    # Ok, so now we can extract labels
+    local lab=$(echo "$ver" | grep -E -o "[A-Za-z-][A-Za-z0-9-]*(\.[A-Za-z0-9-]+)*" | head -n1)
+
+    # If labels was written correctly they starts with hyphen. We should remove it.
+    if [ "$(echo "$lab" | cut -c 1)" = "-" ]; then
+        lab="$(echo "$lab" | cut -c 2-)"
     fi
 
+    # Finally we should remove leading zeros from numbers
+    local out
+    for part in `echo "$lab" | sed 's/\./ /g'`; do
+        if [ -n "`echo "$part" | grep -E -x '[0-9]+'`" ]; then
+            out="${out}.$(echo $part | grep -E -o '(0|[1-9]+)$')"
+        else
+            out="${out}.$part"
+        fi
+    done
+
+    # Remove trailing dot
+    echo -n $out | cut -c 2-
+
+}
+
+get_metadata()
+{
+    echo -n "$1+" | cut -d '+' -f 2
 }
 
 get_major()
 {
-    echo "$1" | grep -E -o "^$_num_part"
+    echo -n "$1" | cut -d '.' -f 1
 }
 
 get_minor()
 {
-    min=$(echo "$1" | grep -E -o "^$_num_part.$_num_part")
-    min=${min#*.}
+    minor=$(echo "$1." | cut -d '.' -f 2)
 
-    if [ -z "$min" ]; then
+    if [ -z "$minor" ]; then
         echo -n 0
     else
-        echo -n $min
+        echo -n $minor
+    fi
+}
+
+get_bugfix()
+{
+    bugfix=$(echo "$1." | cut -d '.' -f 3)
+
+    if [ -z "$bugfix" ]; then
+        echo -n 0
+    else
+        echo -n $bugfix
     fi
 }
 
@@ -56,15 +109,15 @@ semver_eq()
 
 semver_lt()
 {
-    local version_a=$(get_version $1)
-    local version_b=$(get_version $2)
+    local number_a=$(get_number $1)
+    local number_b=$(get_number $2)
     local labels_a=$(get_labels $1)
     local labels_b=$(get_labels $2)
 
     local head_a=''
     local head_b=''
-    local rest_a=$version_a
-    local rest_b=$version_b
+    local rest_a=$number_a
+    local rest_b=$number_b
     while [ -n "$rest_a" ] || [ -n "$rest_b" ]; do
         head_a=${rest_a%%.*}
         head_b=${rest_b%%.*}
@@ -121,7 +174,6 @@ regex_match()
     for i in $(seq 0 9); do
         unset "MATCHED_VER_$i"
         unset "MATCHED_NUM_$i"
-        unset "MATCHED_LAB_$i"
     done
 
     if [ -z "$match" ]; then
@@ -132,13 +184,11 @@ regex_match()
     local i=1
     for part in $(echo $string); do
         local ver="$(eval "echo '$part' | grep -E -o '$RE_VER'   | head -n 1 | sed 's/ \t//g'")";
-        local num="$(eval "echo '$part' | grep -E -o '$RE_NUM'   | head -n 1 ")";
-        local lab="$(eval "echo '$part' | grep -E -o '\-$RE_LAB' | cut -c 2- ")";
+        local num=$(get_number "$ver")
 
         if [ -n "$ver" ]; then
             eval "MATCHED_VER_$i='$ver'"
             eval "MATCHED_NUM_$i='$num'"
-            eval "MATCHED_LAB_$i='$lab'"
             i=$(( i + 1 ))
         fi
     done
@@ -150,43 +200,43 @@ resolve_rule()
 {
     # Specific version
     if regex_match "$1" "[v=]?$RE_VER"; then
-        echo "eq $MATCHED_VER_1"
+        echo "eq $MATCHED_NUM_1"
 
     # Greater than
     elif regex_match "$1" ">$RE_VER"; then
-        echo "gt $MATCHED_VER_1"
+        echo "gt $MATCHED_NUM_1"
 
     # Less than
     elif regex_match "$1" "<$RE_VER"; then
-        echo "lt $MATCHED_VER_1"
+        echo "lt $MATCHED_NUM_1-0"
 
     # Greater than or equal to
     elif regex_match "$1" ">=$RE_VER"; then
-        echo "ge $MATCHED_VER_1"
+        echo "ge $MATCHED_NUM_1"
 
     # Less than or equal to
     elif regex_match "$1" "<=$RE_VER"; then
-        echo "le $MATCHED_VER_1"
+        echo "le $MATCHED_NUM_1"
 
     # Ranges
     elif regex_match "$1" "$RE_VER - $RE_VER"; then
-        echo "ge_le $MATCHED_VER_1 $MATCHED_VER_2"
+        echo "ge_le $MATCHED_NUM_1 $MATCHED_VER_2"
     elif regex_match "$1" ">$RE_VER <$RE_VER"; then
-        echo "gt_lt $MATCHED_VER_1 $MATCHED_VER_2"
+        echo "gt_lt $MATCHED_NUM_1 $MATCHED_VER_2"
     elif regex_match "$1" ">$RE_VER <=$RE_VER"; then
-        echo "gt_le $MATCHED_VER_1 $MATCHED_VER_2"
+        echo "gt_le $MATCHED_NUM_1 $MATCHED_VER_2"
     elif regex_match "$1" ">=$RE_VER <$RE_VER"; then
-        echo "ge_lt $MATCHED_VER_1 $MATCHED_VER_2"
+        echo "ge_lt $MATCHED_NUM_1 $MATCHED_VER_2"
     elif regex_match "$1" ">=$RE_VER <=$RE_VER"; then
-        echo "ge_le $MATCHED_VER_1 $MATCHED_VER_2"
+        echo "ge_le $MATCHED_NUM_1 $MATCHED_VER_2"
 
     # Tilde
     elif regex_match "$1" "~$RE_VER"; then
-        echo "tilde $MATCHED_VER_1"
+        echo "tilde $MATCHED_NUM_1"
 
     # Caret
     # elif regex_match "$1" "\^$RE_VER"; then
-    #     echo "caret $MATCHED_VER_1"
+    #     echo "caret $MATCHED_NUM_1"
 
     else
         return 1
@@ -208,7 +258,7 @@ rule_le()
 
 rule_lt()
 {
-    semver_lt $2 $1 && return 0 || return 1;
+    semver_lt $2 "$1" && return 0 || return 1;
 }
 
 rule_ge()
@@ -259,7 +309,7 @@ rule_ge_le()
 
 rule_tilde()
 {
-    num=$(get_version "$1")
+    num=$(get_number "$1")
     maj=$(get_major "$1")
     min=$(get_minor "$1")
 
