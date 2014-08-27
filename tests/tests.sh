@@ -135,22 +135,25 @@ describe 'reslove_rule'
     assert "$RET" "le 1.2.3"                                "Less than or equal to (<=1.2.3)"
 
     RET=$(resolve_rule '1.2.3 - 4.5.6')
-    assert "$RET" "ge_le 1.2.3 4.5.6"                       "Range (1.2.3 - 4.5.6)"
+    assert "$RET" "ge 1.2.3\nle 4.5.6"                      "Range (1.2.3 - 4.5.6)"
 
     RET=$(resolve_rule '>1.2.3 <4.5.6')
-    assert "$RET" "gt_lt 1.2.3 4.5.6"                       "Range (>1.2.3 <4.5.6)"
+    assert "$RET" "gt 1.2.3\nlt 4.5.6-0"                    "Range (>1.2.3 <4.5.6)"
 
     RET=$(resolve_rule '>1.2.3 <=4.5.6')
-    assert "$RET" "gt_le 1.2.3 4.5.6"                       "Range (>1.2.3 <=4.5.6)"
+    assert "$RET" "gt 1.2.3\nle 4.5.6"                      "Range (>1.2.3 <=4.5.6)"
 
     RET=$(resolve_rule '>=1.2.3 <4.5.6')
-    assert "$RET" "ge_lt 1.2.3 4.5.6"                       "Range (>=1.2.3 <4.5.6)"
+    assert "$RET" "ge 1.2.3\nlt 4.5.6-0"                    "Range (>=1.2.3 <4.5.6)"
 
     RET=$(resolve_rule '>=1.2.3 <=4.5.6')
-    assert "$RET" "ge_le 1.2.3 4.5.6"                       "Range (>=1.2.3 <=4.5.6)"
+    assert "$RET" "ge 1.2.3\nle 4.5.6"                      "Range (>=1.2.3 <=4.5.6)"
 
     RET=$(resolve_rule '~1.2.3')
-    assert "$RET" "tilde 1.2.3"                             "Tilde (~1.2.3)"
+    assert "$RET" "ge 1.2.3\nlt 1.3.0-0"                    "Tilde (~1.2.3)"
+
+    RET=$(resolve_rule '*')
+    assert "$RET" "ge 0.0.0-0"                              "Wildcard (*)"
 
     #RET=$(resolve_rule '1.2.x')
     #assert "$RET" "tilde 1.2"                               "Wildcard (1.2.x)"
@@ -160,63 +163,3 @@ describe 'reslove_rule'
 
     #RET=$(resolve_rule '^1.2.3')
     #assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
-
-describe "rule_eq"
-    rule_eq '1.2.3' '1.2.3'
-    assert $? 0
-
-    rule_eq '1.2.3-abc+abc' '1.2.3-abc+xyz'
-    assert $? 0
-
-    rule_eq '1.2.3-a' '1.2.3-b'
-    assert $? 1
-
-describe "rule_gt_lt"
-    rule_gt_lt '1.2.3' '2.3.4' '1.2.3'
-    assert $? 1
-
-    rule_gt_lt '1.2.3' '2.3.4' '2.1.0'
-    assert $? 0
-
-    rule_gt_lt '1.2.3' '2.3.4' '2.3.4'
-    assert $? 1
-
-describe "rule_gt_le"
-    rule_gt_le '1.2.3' '2.3.4' '1.2.3'
-    assert $? 1
-
-    rule_gt_le '1.2.3' '2.3.4' '2.1.0'
-    assert $? 0
-
-    rule_gt_le '1.2.3' '2.3.4' '2.3.4'
-    assert $? 0
-
-describe "rule_ge_lt"
-    rule_ge_lt '1.2.3' '2.3.4' '1.2.3'
-    assert $? 0
-
-    rule_ge_lt '1.2.3' '2.3.4' '2.1.0'
-    assert $? 0
-
-    rule_ge_lt '1.2.3' '2.3.4' '2.3.4'
-    assert $? 1
-
-describe "rule_ge_le"
-    rule_ge_le '1.2.3' '2.3.4' '1.2.3'
-    assert $? 0
-
-    rule_ge_le '1.2.3' '2.3.4' '2.1.0'
-    assert $? 0
-
-    rule_ge_le '1.2.3' '2.3.4' '2.3.4'
-    assert $? 0
-
-describe "rule_tilde"
-    rule_tilde '1.2.3' '1.2.2'
-    assert $? 1
-
-    rule_tilde '1.2.3' '1.2.5'
-    assert $? 0
-
-    rule_tilde '1.2.3' '1.3.0'
-    assert $? 1

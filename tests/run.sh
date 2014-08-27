@@ -23,7 +23,12 @@ assert()
 
     LABEL=${3:-Test $CURRENT_COUNTER}
 
-    if [ "$1" = "$2" ]; then
+    # This echoes are required for multiline strings comparison.
+    # Belive me or not, but this is not true:
+    #   a="a\nb"
+    #   b="$(echo 'a'; echo 'b')"
+    #   [ "$a" = "$b" ]
+    if [ "$(echo "$1")" = "$(echo "$2")" ]; then
         printf "    \033[32m$LABEL\033[0m\n"
         OK_COUNT=$(( OK_COUNT + 1 ))
     else

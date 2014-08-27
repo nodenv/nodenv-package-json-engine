@@ -167,18 +167,22 @@ semver_ge()
 
 regex_match()
 {
-    local string="$1"
+    local string="$1 "
     local regexp="$2"
-    local match="$(eval "echo '$string' | grep -E -x '[ \t]*$regexp[ \t]*'")";
+    local match="$(eval "echo '$string' | grep -E -o '^[ \t]*$regexp[ \t]+'")";
 
     for i in $(seq 0 9); do
         unset "MATCHED_VER_$i"
         unset "MATCHED_NUM_$i"
     done
+    unset REST
 
     if [ -z "$match" ]; then
         return 1
     fi
+
+    local match_len=$(echo "$match" | wc -c)
+    REST=`echo "$string" | cut -c $match_len-`
 
     local part
     local i=1
@@ -198,54 +202,57 @@ regex_match()
 
 resolve_rule()
 {
-    # Specific version
-    if regex_match "$1" "[v=]?$RE_VER"; then
-        echo "eq $MATCHED_NUM_1"
+    rule="$1"
 
-    # Greater than
-    elif regex_match "$1" ">$RE_VER"; then
-        echo "gt $MATCHED_NUM_1"
+    while true; do
+        # Range
+        if regex_match "$rule" "$RE_VER - $RE_VER"; then
+            echo "ge $MATCHED_NUM_1"
+            echo "le $MATCHED_NUM_2"
 
-    # Less than
-    elif regex_match "$1" "<$RE_VER"; then
-        echo "lt $MATCHED_NUM_1-0"
+        # Specific version
+        elif regex_match "$rule" "[v=]?$RE_VER"; then
+            echo "eq $MATCHED_NUM_1"
 
-    # Greater than or equal to
-    elif regex_match "$1" ">=$RE_VER"; then
-        echo "ge $MATCHED_NUM_1"
+        # Greater than
+        elif regex_match "$rule" ">$RE_VER"; then
+            echo "gt $MATCHED_NUM_1"
 
-    # Less than or equal to
-    elif regex_match "$1" "<=$RE_VER"; then
-        echo "le $MATCHED_NUM_1"
+        # Less than
+        elif regex_match "$rule" "<$RE_VER"; then
+            echo "lt $MATCHED_NUM_1-0"
 
-    # Ranges
-    elif regex_match "$1" "$RE_VER - $RE_VER"; then
-        echo "ge_le $MATCHED_NUM_1 $MATCHED_VER_2"
-    elif regex_match "$1" ">$RE_VER <$RE_VER"; then
-        echo "gt_lt $MATCHED_NUM_1 $MATCHED_VER_2"
-    elif regex_match "$1" ">$RE_VER <=$RE_VER"; then
-        echo "gt_le $MATCHED_NUM_1 $MATCHED_VER_2"
-    elif regex_match "$1" ">=$RE_VER <$RE_VER"; then
-        echo "ge_lt $MATCHED_NUM_1 $MATCHED_VER_2"
-    elif regex_match "$1" ">=$RE_VER <=$RE_VER"; then
-        echo "ge_le $MATCHED_NUM_1 $MATCHED_VER_2"
+        # Greater than or equal to
+        elif regex_match "$rule" ">=$RE_VER"; then
+            echo "ge $MATCHED_NUM_1"
 
-    # Tilde
-    elif regex_match "$1" "~$RE_VER"; then
-        echo "tilde $MATCHED_NUM_1"
+        # Less than or equal to
+        elif regex_match "$rule" "<=$RE_VER"; then
+            echo "le $MATCHED_NUM_1"
 
-    # Caret
-    # elif regex_match "$1" "\^$RE_VER"; then
-    #     echo "caret $MATCHED_NUM_1"
+        # Tilde
+        elif regex_match "$rule" "~$RE_VER"; then
+            echo "ge $MATCHED_NUM_1"
+            echo "lt $(get_major $MATCHED_NUM_1).$(( $(get_minor $MATCHED_NUM_1) + 1 )).0-0"
 
-    else
-        return 1
-    fi
+        # Wildcards
+        elif regex_match "$rule" "(>=)?\*"; then
+            echo "ge 0.0.0-0"
 
-    return 0
+        # Caret
+        # elif regex_match "$1" "\^$RE_VER"; then
+        #     echo "caret $MATCHED_NUM_1"
+
+        elif [ -z "$rule" ]; then
+            return 0
+        else
+            return 1
+        fi
+
+        rule="$REST"
+    done
 }
 
-# Rules
 rule_eq()
 {
     semver_eq $2 $1 && return 0 || return 1;
@@ -271,80 +278,49 @@ rule_gt()
     semver_gt $2 $1 && return 0 || return 1;
 }
 
-rule_gt_lt()
-{
-    if semver_gt $3 $1 && semver_lt $3 $2; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-rule_gt_le()
-{
-    if semver_gt $3 $1 && semver_le $3 $2; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-rule_ge_lt()
-{
-    if semver_ge $3 $1 && semver_lt $3 $2; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-rule_ge_le()
-{
-    if semver_ge $3 $1 && semver_le $3 $2; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-rule_tilde()
-{
-    num=$(get_number "$1")
-    maj=$(get_major "$1")
-    min=$(get_minor "$1")
-
-    if semver_ge "$2" "$num-0" && semver_le "$2" "$maj"".$(( $min + 1 )).0-0"; then
-        return 0
-    else
-        return 1
-    fi
-}
 if [ $# -eq 0 ]; then
     echo "Usage:    $0 -r <rule> <version> [<version>... ]"
 fi
 
 while getopts r:h o; do
     case "$o" in
-        r) rule="rule_$(resolve_rule "$OPTARG")";;
+        r) rules_string="$OPTARG";;
         h|?) echo "Usage:    $0 -r <rule> <version> [<version>... ]"
     esac
 done
 
-if [ "$rule" = "rule_" ]; then
+shift $(( $OPTIND-1 ))
+
+rules=$(resolve_rule "$rules_string")
+
+if [ $? -eq 1 ]; then
     exit
 fi
-
-shift $(( $OPTIND-1 ))
 
 for ver in $@; do
     if [ -z `echo "$ver" | grep -E -x "[v=]?[ \t]*$RE_VER"` ]; then
         continue
     fi
+
     ver=`echo "$ver" | grep -E -x "$RE_VER"`
-    if [ -z "$rule" ] || $rule "$ver"; then
-        if semver_lt "$max" "$ver"; then
-            max="$ver"
-            echo $ver
+
+    success=true
+    while read -r rule; do
+        rule_$rule "$ver"
+        if [ $? -eq 1 ]; then
+            success=false
+            break
         fi
+    done \
+<<EOF
+$rules
+EOF
+
+    if $success && semver_lt "$max" "$ver"; then
+        max="$ver"
     fi
 done
+
+if [ -n "$max" ]; then
+    echo $max
+fi
