@@ -302,41 +302,60 @@ fi
 
 while getopts r:h o; do
     case "$o" in
-        r) rules_string="$OPTARG";;
+        r) rules_string="$OPTARG||";;
         h|?) echo "Usage:    $0 -r <rule> <version> [<version>... ]"
     esac
 done
 
 shift $(( $OPTIND-1 ))
 
-rules=$(resolve_rule "$rules_string")
+while [ -n "$rules_string" ]; do
+    head="${rules_string%%||*}"
 
-if [ $? -eq 1 ]; then
-    exit
-fi
+    if [ "$head" = "$rules_string" ]; then
+        rules_string=""
+    else
+        rules_string="${rules_string#*||}"
+    fi
 
-for ver in $@; do
-    if [ -z `echo "$ver" | grep -E -x "[v=]?[ \t]*$RE_VER"` ]; then
+    if [ -z "$head" ] || [ -n "$(echo "$head" | grep -E -x '[ \t]*')" ]; then
+        group=$(( $group + 1 ))
         continue
     fi
 
-    ver=`echo "$ver" | grep -E -x "$RE_VER"`
+    rules="$(resolve_rule "$head")"
 
-    success=true
-    while read -r rule; do
-        rule_$rule "$ver"
-        if [ $? -eq 1 ]; then
-            success=false
-            break
+    if [ $? -eq 1 ]; then
+        exit
+    fi
+
+    for ver in $@; do
+        if [ -z `echo "$ver" | grep -E -x "[v=]?[ \t]*$RE_VER"` ]; then
+            continue
         fi
-    done \
+
+        ver=`echo "$ver" | grep -E -x "$RE_VER"`
+
+        success=true
+        while read -r rule; do
+            rule_$rule "$ver"
+            if [ $? -eq 1 ]; then
+                success=false
+                break
+            fi
+        done \
 <<EOF
 $rules
 EOF
 
-    if $success && semver_lt "$max" "$ver"; then
-        max="$ver"
-    fi
+        if $success; then
+            if [ -z "$max" ] || semver_lt "$max" "$ver"; then
+                max="$ver"
+            fi
+        fi
+    done
+
+    group=$(( $group + 1 ))
 done
 
 if [ -n "$max" ]; then
