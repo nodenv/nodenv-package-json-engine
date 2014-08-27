@@ -101,10 +101,26 @@ strip_metadata()
 
 semver_eq()
 {
-    ver1=$(strip_metadata $1)
-    ver2=$(strip_metadata $2)
+    local ver1=$(get_number $1)
+    local ver2=$(get_number $2)
 
-    [ "$ver1" = "$ver2" ] && return 0 || return 1
+    local count=1
+    while true; do
+        local part1=$(echo $ver1'.' | cut -d '.' -f $count)
+        local part2=$(echo $ver2'.' | cut -d '.' -f $count)
+
+        if [ -z "$part1" ] || [ -z "$part2" ]; then
+            break
+        fi
+
+        if [ "$part1" != "$part2" ]; then
+            return 1
+        fi
+
+        local count=$(( count + 1 ))
+    done
+
+    return 0
 }
 
 semver_lt()
@@ -236,8 +252,10 @@ resolve_rule()
             echo "lt $(get_major $MATCHED_NUM_1).$(( $(get_minor $MATCHED_NUM_1) + 1 )).0-0"
 
         # Wildcards
-        elif regex_match "$rule" "(>=)?\*"; then
+        elif regex_match "$rule" "(>=)?[*x]"; then
             echo "ge 0.0.0-0"
+        elif regex_match "$rule" "$RE_NUM(\.[*x])+"; then
+            echo "eq $MATCHED_NUM_1"
 
         # Caret
         # elif regex_match "$1" "\^$RE_VER"; then

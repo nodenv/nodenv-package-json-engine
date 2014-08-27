@@ -59,6 +59,15 @@ describe 'semver_eq'
     semver_eq 1.2.3 1.2.4
     assert $? 1
 
+    semver_eq 1.2.3 1.2
+    assert $? 0
+
+    semver_eq 1.2.3 1
+    assert $? 0
+
+    semver_eq 2.2 1
+    assert $? 1
+
 describe 'semver_lt'
     semver_lt 1.2.2 1.2.3
     assert $? 0
@@ -155,11 +164,11 @@ describe 'reslove_rule'
     RET=$(resolve_rule '*')
     assert "$RET" "ge 0.0.0-0"                              "Wildcard (*)"
 
-    #RET=$(resolve_rule '1.2.x')
-    #assert "$RET" "tilde 1.2"                               "Wildcard (1.2.x)"
+    RET=$(resolve_rule '1.2.x')
+    assert "$RET" "eq 1.2"                                  "Wildcard (1.2.x)"
 
-    #RET=$(resolve_rule '1.*')
-    #assert "$RET" "tilde 1"                                 "Wildcard (1.*)"
+    RET=$(resolve_rule '1.*')
+    assert "$RET" "eq 1"                                    "Wildcard (1.*)"
 
     #RET=$(resolve_rule '^1.2.3')
     #assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
