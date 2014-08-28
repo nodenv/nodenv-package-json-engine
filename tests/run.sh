@@ -59,6 +59,7 @@ summary()
 
 # Import specs
 . ./tests/tests.sh
+. ./tests/strict_rules_tests.sh
 . ./tests/node_semver_tests.sh
 
 
