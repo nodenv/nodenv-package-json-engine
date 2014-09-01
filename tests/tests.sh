@@ -172,3 +172,29 @@ describe 'reslove_rule'
 
     #RET=$(resolve_rule '^1.2.3')
     #assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
+
+describe 'normalize_rules'
+    RET="$(normalize_rules '  \t  >\t\t1.2.3.4-abc.def+a   \t 123.123   -\t\t\t  v5.3.2  ~ \tv5.5.x  ')"
+    assert "$RET" '>1.2.3.4-abc.def+a 123.123_-_5.3.2 ~5.5.*'
+
+describe 'read_rule'
+    read_rule '~1.2.3 4.5.6_-_7.8.9 *' rule
+    assert $? 0                                             'Read 1st rule - should return true'
+    assert $RULEIND 1                                       'Read 1st rule - $RULEIND should be 1'
+    assert "$rule" "~#"                                     'Read 1st rule - $rule should be "~#"'
+    assert "$RULEVER_1" "1.2.3"                             'Read 1st rule - $RULEVER_1 should be "1.2.3"'
+
+    read_rule '~1.2.3 4.5.6_-_7.8.9 *' rule
+    assert $? 0                                             'Read 2nd rule - should return true'
+    assert $RULEIND 2                                       'Read 2nd rule - $RULEIND should be 2'
+    assert "$rule" "#_-_#"                                  'Read 2nd rule - $rule should be "#_-_#"'
+    assert "$RULEVER_1" "4.5.6"                             'Read 2nd rule - $RULEVER_1 should be "4.5.6"'
+    assert "$RULEVER_2" "7.8.9"                             'Read 2nd rule - $RULEVER_1 should be "7.8.9"'
+
+    read_rule '~1.2.3 4.5.6_-_7.8.9 *' rule
+    assert $? 0                                             'Read 3rd rule - should return true'
+    assert $RULEIND 3                                       'Read 3rd rule - $RULEIND should be 3'
+    assert "$rule" "*"                                      'Read 3rd rule - $rule should be "*"'
+
+    read_rule '~1.2.3 4.5.6_-_7.8.9 *' rule
+    assert $? 1                                             'Read 4th rule - should return false'

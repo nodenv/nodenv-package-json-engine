@@ -9,6 +9,11 @@ RE_LAB="$_lab_part(\.$_lab_part)*"
 RE_MET="$_met_part(\.$_met_part)*"
 RE_VER="[ \t]*$RE_NUM(-$RE_LAB)?(\+$RE_MET)?"
 
+BRE_NUM='[0-9]\{1,\}\(\.[0-9]\{1,\}\)*'
+BRE_PRE='[0-9a-zA-Z-]\{1,\}\(\.[0-9a-zA-Z-]\{1,\}\)*'
+BRE_MET='[0-9A-Za-z-]\{1,\}'
+BRE_VER="$BRE_NUM\(-$BRE_PRE\)\{0,1\}\(+$BRE_MET\)\{0,1\}"
+
 filter()
 {
     local text="$1"
@@ -185,7 +190,7 @@ regex_match()
 {
     local string="$1 "
     local regexp="$2"
-    local match="$(eval "echo '$string' | grep -E -o '^[ \t]*$regexp[ \t]+'")";
+    local match="$(eval "echo '$string' | grep -E -o '^[ \t]*($regexp)[ \t]+'")";
 
     for i in $(seq 0 9); do
         unset "MATCHED_VER_$i"
@@ -216,58 +221,74 @@ regex_match()
     return 0
 }
 
+# Normalizes rules string
+#
+# * replaces chains of whitespaces with single spaces
+# * replaces whitespaces around hyphen operator with "_"
+# * replaces "x" with "*"
+# * removes whitespace between operators and version numbers
+# * removes leading "v" from version numbers
+# * removes leading and trailing spaces
+normalize_rules()
+{
+    echo " $1" \
+        | sed 's/\t/ /g' \
+        | sed 's/ \{2,\}/ /g' \
+        | sed 's/ - /_-_/g' \
+        | sed 's/\([~^<>=]\) /\1/g' \
+        | sed 's/\([ _~^<>=]\)v/\1/g' \
+        | sed 's/x/*/g' \
+        | sed 's/^ //g' \
+        | sed 's/ $//g'
+}
+
+# Reads rule from provided string
+read_rule()
+{
+    RULEIND=$(( $RULEIND + 1 ))
+
+    local _rule="$( echo "$1 " | cut -d ' ' -f $RULEIND  )"
+    local _idnt="$( echo "$_rule" | sed "s/$BRE_VER/#/g" )"
+    local _vers="$( echo "$_rule" | grep -o "$BRE_VER"   )"
+
+    # if rule is empty - there is no more rules
+    if [ -z "$_rule" ]; then
+        return 1
+    fi
+
+    local _i=1;
+    for ver in `echo $_vers`; do
+        eval "RULEVER_$_i='$ver'"
+        _i=$(( $_i + 1 ))
+    done
+
+    # set global variable
+    eval "$2='$_idnt'"
+}
+
 resolve_rule()
 {
-    rule="$1"
+    RULEIND=0
 
-    while true; do
-        # Range
-        if regex_match "$rule" "$RE_VER - $RE_VER"; then
-            echo "ge $MATCHED_NUM_1"
-            echo "le $MATCHED_NUM_2"
+    local rules="$(normalize_rules "$1")"
+    local output=""
 
-        # Specific version
-        elif regex_match "$rule" "[v=]?$RE_VER"; then
-            echo "eq $MATCHED_NUM_1"
-
-        # Greater than
-        elif regex_match "$rule" ">$RE_VER"; then
-            echo "gt $MATCHED_NUM_1"
-
-        # Less than
-        elif regex_match "$rule" "<$RE_VER"; then
-            echo "lt $MATCHED_NUM_1-0"
-
-        # Greater than or equal to
-        elif regex_match "$rule" ">=$RE_VER"; then
-            echo "ge $MATCHED_NUM_1"
-
-        # Less than or equal to
-        elif regex_match "$rule" "<=$RE_VER"; then
-            echo "le $MATCHED_NUM_1"
-
-        # Tilde
-        elif regex_match "$rule" "~$RE_VER"; then
-            echo "ge $MATCHED_NUM_1"
-            echo "lt $(get_major $MATCHED_NUM_1).$(( $(get_minor $MATCHED_NUM_1) + 1 )).0-0"
-
-        # Wildcards
-        elif regex_match "$rule" "(>=)?[*x]"; then
-            echo "ge 0.0.0-0"
-        elif regex_match "$rule" "$RE_NUM(\.[*x])+"; then
-            echo "eq $MATCHED_NUM_1"
-
-        # Caret
-        # elif regex_match "$1" "\^$RE_VER"; then
-        #     echo "caret $MATCHED_NUM_1"
-
-        elif [ -z "$rule" ]; then
-            return 0
-        else
-            return 1
-        fi
-
-        rule="$REST"
+    while read_rule "$rules" rule; do
+        case "$rule" in
+            '*')     echo ge 0.0.0-0;;
+            '#')     echo eq $RULEVER_1;;
+            '<#')    echo lt $RULEVER_1;;
+            '>#')    echo gt $RULEVER_1;;
+            '<=#')   echo le $RULEVER_1;;
+            '>=#')   echo ge $RULEVER_1;;
+            '#_-_#') echo ge $RULEVER_1
+                     echo le $RULEVER_2;;
+            #'~#')    echo tilde;;
+            #'^#')    echo caret;;
+            '#.*')   echo eq $RULEVER_1;;
+            '#.*.*') echo eq $RULEVER_1;;
+            *)       return 1
+        esac
     done
 }
 
