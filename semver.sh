@@ -49,23 +49,26 @@ get_major()
 # Gets minor number from normalized version
 get_minor()
 {
-    minor=$(echo "$1." | cut -d '.' -f 2)
+    minor_major_bug=${1%%-*}
+    minor_major=${minor_major_bug%.*}
+    minor=${minor_major#*.}
 
-    if [ -z "$minor" ]; then
-        echo -n 0
+    if [ "$minor" = "$minor_major" ]; then
+        echo
     else
-        echo -n $minor
+        echo $minor
     fi
 }
 
 get_bugfix()
 {
-    bugfix=$(echo "$1." | cut -d '.' -f 3)
+    minor_major_bug=${1%%-*}
+    bugfix=${minor_major_bug##*.*.}
 
-    if [ -z "$bugfix" ]; then
-        echo -n 0
+    if [ "$bugfix" = "$minor_major_bug" ]; then
+        echo
     else
-        echo -n $bugfix
+        echo $bugfix
     fi
 }
 
@@ -102,22 +105,24 @@ semver_lt()
 {
     local number_a=$(get_number $1)
     local number_b=$(get_number $2)
-    local labels_a=$(get_labels $1)
-    local labels_b=$(get_labels $2)
+    local labels_a=$(get_prerelease $1)
+    local labels_b=$(get_prerelease $2)
 
     local head_a=''
     local head_b=''
-    local rest_a=$number_a
-    local rest_b=$number_b
+    local rest_a=$number_a.
+    local rest_b=$number_b.
     while [ -n "$rest_a" ] || [ -n "$rest_b" ]; do
         head_a=${rest_a%%.*}
         head_b=${rest_b%%.*}
         rest_a=${rest_a#*.}
         rest_b=${rest_b#*.}
-        [ "$rest_a" = "$head_a" ] && rest_a=''
-        [ "$rest_b" = "$head_b" ] && rest_b=''
-        [ -z "$head_a" ] && head_a=0
-        [ -z "$head_b" ] && head_b=0
+        #[ "$rest_a" = "$head_a" ] && rest_a=''
+        #[ "$rest_b" = "$head_b" ] && rest_b=''
+
+        if [ -z "$head_a" ] || [ -z "$head_b" ]; then
+            return 1
+        fi
 
         if [ "$head_a" -eq "$head_b" ]; then
             continue
@@ -274,12 +279,26 @@ rule_le()
 
 rule_lt()
 {
-    semver_lt $2 "$1" && return 0 || return 1;
+    local rule_ver=$1
+    local tested_ver=$2
+
+    if [ -n "$(get_bugfix $rule_ver)" ] && [ -z "$(get_prerelease $rule_ver)" ]; then
+        rule_ver="$rule_ver-0"
+    fi
+
+    semver_lt $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_ge()
 {
-    semver_ge $2 $1 && return 0 || return 1;
+    local rule_ver=$1
+    local tested_ver=$2
+
+    if [ -n "$(get_bugfix $rule_ver)" ] && [ -z "$(get_prerelease $rule_ver)" ]; then
+        rule_ver="$rule_ver-0"
+    fi
+
+    semver_ge $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_gt()

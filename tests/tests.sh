@@ -1,56 +1,38 @@
 describe 'get_number'
-    RET=$(get_number '1.2.3.4-0')
-    assert "$RET" "1.2.3.4"
-
-    RET=$(get_number 'v 0.01.002.0003-0')
-    assert "$RET" "0.1.2.3"
-
-    RET=$(get_number '= 4.5.09beta')
-    assert "$RET" "4.5.9"
-
-    RET=$(get_number 'v1.2.3-abc.009.00a+meta')
+    RET=$(get_number '1.2.3-a-b-3.2.1+meta')
     assert "$RET" "1.2.3"
 
-describe 'get_labels'
-    RET=$(get_labels '1.2.3')
-    assert "$RET" ""
+    RET=$(get_number '1-1.2.3')
+    assert "$RET" "1"
 
-    RET=$(get_labels 'v1.2.3')
-    assert "$RET" ""
+describe 'get_prerelease'
+    RET=$(get_prerelease '1.2.3-a-b-3.2.1+meta')
+    assert "$RET" "a-b-3.2.1"
 
-    RET=$(get_labels '1.2.3.4-1.2.3.4.a.b.c-def')
-    assert "$RET" "1.2.3.4.a.b.c-def"
-
-    RET=$(get_labels 'v1.2.3-abc.009.00a+meta')
-    assert "$RET" "abc.9.00a"
-
-    RET=$(get_labels '=4.5.09beta')
-    assert "$RET" "beta"
-
-describe 'get_metadata'
-    RET=$(get_metadata '1.2.3.4-0')
-    assert "$RET" ""
-
-    RET=$(get_metadata 'v1.2.3-abc.009.00a+meta')
-    assert "$RET" "meta"
+describe 'strip_metadata'
+    RET=$(strip_metadata '1.2.3-a-b-3.2.1+meta')
+    assert "$RET" "1.2.3-a-b-3.2.1"
 
 describe 'get_major'
-    RET=$(get_major 1.2.3.4)
+    RET=$(get_major 1.2.3)
     assert "$RET" "1"
 
 describe 'get_minor'
-    RET=$(get_minor 1.2.3.4)
+    RET=$(get_minor 1.2.3)
     assert "$RET" "2"
 
     RET=$(get_minor 1)
-    assert "$RET" "0"
+    assert "$RET" ""
 
 describe 'get_bugfix'
-    RET=$(get_bugfix 1.2.3.4)
+    RET=$(get_bugfix 1.2.3)
     assert "$RET" "3"
 
+    RET=$(get_bugfix 1.2)
+    assert "$RET" ""
+
     RET=$(get_bugfix 1)
-    assert "$RET" "0"
+    assert "$RET" ""
 
 describe 'semver_eq'
     semver_eq 1.2.3 1.2.3
@@ -135,7 +117,7 @@ describe 'reslove_rule'
     assert "$RET" "gt 1.2.3"                                "Greater than (>1.2.3)"
 
     RET=$(resolve_rule '<1.2.3')
-    assert "$RET" "lt 1.2.3-0"                              "Less than (<1.2.3)"
+    assert "$RET" "lt 1.2.3"                                "Less than (<1.2.3)"
 
     RET=$(resolve_rule '>=1.2.3')
     assert "$RET" "ge 1.2.3"                                "Greater than or equal to (>=1.2.3)"
@@ -147,19 +129,19 @@ describe 'reslove_rule'
     assert "$RET" "ge 1.2.3\nle 4.5.6"                      "Range (1.2.3 - 4.5.6)"
 
     RET=$(resolve_rule '>1.2.3 <4.5.6')
-    assert "$RET" "gt 1.2.3\nlt 4.5.6-0"                    "Range (>1.2.3 <4.5.6)"
+    assert "$RET" "gt 1.2.3\nlt 4.5.6"                      "Range (>1.2.3 <4.5.6)"
 
     RET=$(resolve_rule '>1.2.3 <=4.5.6')
     assert "$RET" "gt 1.2.3\nle 4.5.6"                      "Range (>1.2.3 <=4.5.6)"
 
     RET=$(resolve_rule '>=1.2.3 <4.5.6')
-    assert "$RET" "ge 1.2.3\nlt 4.5.6-0"                    "Range (>=1.2.3 <4.5.6)"
+    assert "$RET" "ge 1.2.3\nlt 4.5.6"                      "Range (>=1.2.3 <4.5.6)"
 
     RET=$(resolve_rule '>=1.2.3 <=4.5.6')
     assert "$RET" "ge 1.2.3\nle 4.5.6"                      "Range (>=1.2.3 <=4.5.6)"
 
     RET=$(resolve_rule '~1.2.3')
-    assert "$RET" "ge 1.2.3\nlt 1.3.0-0"                    "Tilde (~1.2.3)"
+    assert "$RET" "tilde 1.2.3"                             "Tilde (~1.2.3)"
 
     RET=$(resolve_rule '*')
     assert "$RET" "ge 0.0.0-0"                              "Wildcard (*)"
@@ -170,8 +152,8 @@ describe 'reslove_rule'
     RET=$(resolve_rule '1.*')
     assert "$RET" "eq 1"                                    "Wildcard (1.*)"
 
-    #RET=$(resolve_rule '^1.2.3')
-    #assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
+    RET=$(resolve_rule '^1.2.3')
+    assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
 
 describe 'normalize_rules'
     RET="$(normalize_rules '  \t  >\t\t1.2.3.4-abc.def+a   \t 123.123   -\t\t\t  v5.3.2  ~ \tv5.5.x  ')"
