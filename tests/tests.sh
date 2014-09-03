@@ -111,7 +111,7 @@ describe 'reslove_rule'
     assert "$RET" "eq 1"                                    "Specific (1)"
 
     RET=$(resolve_rule '=1.2.3-a.2-c')
-    assert "$RET" "eq 1.2.3"                                "Specific (=1.2.3-a.2-c)"
+    assert "$RET" "eq 1.2.3-a.2-c"                          "Specific (=1.2.3-a.2-c)"
 
     RET=$(resolve_rule '>1.2.3')
     assert "$RET" "gt 1.2.3"                                "Greater than (>1.2.3)"

@@ -250,6 +250,7 @@ resolve_rule()
         case "$rule" in
             '*')     echo ge 0.0.0-0;;
             '#')     echo eq $RULEVER_1;;
+            '=#')    echo eq $RULEVER_1;;
             '<#')    echo lt $RULEVER_1;;
             '>#')    echo gt $RULEVER_1;;
             '<=#')   echo le $RULEVER_1;;
