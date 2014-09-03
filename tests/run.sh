@@ -28,7 +28,7 @@ assert()
     #   a="a\nb"
     #   b="$(echo 'a'; echo 'b')"
     #   [ "$a" = "$b" ]
-    if [ "$(echo "$1")" = "$(echo "$2")" ]; then
+    if [ "$(printf "$1")" = "$(printf "$2")" ]; then
         printf "    \033[32m$LABEL\033[0m\n"
         OK_COUNT=$(( OK_COUNT + 1 ))
     else
