@@ -257,7 +257,7 @@ resolve_rule()
             '#_-_#') echo ge $RULEVER_1
                      echo le $RULEVER_2;;
             '~#')    echo tilde $RULEVER_1;;
-            #'^#')    echo caret;;
+            '^#')    echo caret $RULEVER_1;;
             '#.*')   echo eq $RULEVER_1;;
             '#.*.*') echo eq $RULEVER_1;;
             *)       return 1
@@ -317,6 +317,25 @@ rule_tilde()
             return 0
         fi
         if [ -z "$rule_minor" ] && rule_eq $rule_major $tested_ver; then
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+rule_caret()
+{
+    local rule_ver=$1
+    local tested_ver=$2
+
+    if [ -z "$(get_bugfix $rule_ver)" ] || rule_ge $rule_ver $tested_ver; then
+        local rule_major=$(get_major $rule_ver)
+
+        if [ "$rule_major" != "0" ] && rule_eq $rule_major $tested_ver; then
+            return 0
+        fi
+        if [ "$rule_major" = "0" ] && rule_eq $rule_ver $tested_ver; then
             return 0
         fi
     fi
