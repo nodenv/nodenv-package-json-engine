@@ -260,6 +260,7 @@ resolve_rule()
             '^#')    echo caret $RULEVER_1;;
             '#.*')   echo eq $RULEVER_1;;
             '#.*.*') echo eq $RULEVER_1;;
+            '*.*.*') echo ge 0.0.0-0;;
             *)       return 1
         esac
     done
