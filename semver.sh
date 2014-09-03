@@ -22,61 +22,31 @@ filter()
     echo "$text" | grep -E $@ "$regex"
 }
 
-get_version()
-{
-    echo -n "$(get_number "$1")-$(get_labels "$1")+$(get_metadata "$1")"
-}
-
+# Gets number part from normalized version
 get_number()
 {
-    local num=$(echo "$1" | grep -E -o "[0-9]+(\.[0-9]+)*" | head -n1)
-
-    local out
-    for part in `echo "$num" | sed 's/\./ /g'`; do
-        out="${out}.$(echo $part | grep -E -o '(0|[1-9]+)$')"
-    done
-
-    echo -n "$out" | cut -c 2-
+    echo ${1%%-*}
 }
 
-get_labels()
+# Gets prerelase part from normalized version
+get_prerelease()
 {
-    # Skip leading "=" or "v". Especially "v" it breaks finding labels without "-" separator.
-    local ver=$(echo "$1" | grep -E -o "[0-9].*")
-
-    # Ok, so now we can extract labels
-    local lab=$(echo "$ver" | grep -E -o "[A-Za-z-][A-Za-z0-9-]*(\.[A-Za-z0-9-]+)*" | head -n1)
-
-    # If labels was written correctly they starts with hyphen. We should remove it.
-    if [ "$(echo "$lab" | cut -c 1)" = "-" ]; then
-        lab="$(echo "$lab" | cut -c 2-)"
+    pre_and_meta=${1%+*}
+    pre=${pre_and_meta#*-}
+    if [ "$pre" = "$1" ]; then
+        echo
+    else
+        echo $pre
     fi
-
-    # Finally we should remove leading zeros from numbers
-    local out
-    for part in `echo "$lab" | sed 's/\./ /g'`; do
-        if [ -n "`echo "$part" | grep -E -x '[0-9]+'`" ]; then
-            out="${out}.$(echo $part | grep -E -o '(0|[1-9]+)$')"
-        else
-            out="${out}.$part"
-        fi
-    done
-
-    # Remove trailing dot
-    echo -n $out | cut -c 2-
-
 }
 
-get_metadata()
-{
-    echo -n "$1+" | cut -d '+' -f 2
-}
-
+# Gets major number from normalized version
 get_major()
 {
-    echo -n "$1" | cut -d '.' -f 1
+    echo ${1%%.*}
 }
 
+# Gets minor number from normalized version
 get_minor()
 {
     minor=$(echo "$1." | cut -d '.' -f 2)
@@ -101,7 +71,7 @@ get_bugfix()
 
 strip_metadata()
 {
-    echo -n ${1%%+*}
+    echo ${1%+*}
 }
 
 semver_eq()
