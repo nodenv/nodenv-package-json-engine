@@ -117,8 +117,6 @@ semver_lt()
         head_b=${rest_b%%.*}
         rest_a=${rest_a#*.}
         rest_b=${rest_b#*.}
-        #[ "$rest_a" = "$head_a" ] && rest_a=''
-        #[ "$rest_b" = "$head_b" ] && rest_b=''
 
         if [ -z "$head_a" ] || [ -z "$head_b" ]; then
             return 1
@@ -258,7 +256,7 @@ resolve_rule()
             '>=#')   echo ge $RULEVER_1;;
             '#_-_#') echo ge $RULEVER_1
                      echo le $RULEVER_2;;
-            #'~#')    echo tilde;;
+            '~#')    echo tilde $RULEVER_1;;
             #'^#')    echo caret;;
             '#.*')   echo eq $RULEVER_1;;
             '#.*.*') echo eq $RULEVER_1;;
@@ -304,6 +302,26 @@ rule_ge()
 rule_gt()
 {
     semver_gt $2 $1 && return 0 || return 1;
+}
+
+rule_tilde()
+{
+    local rule_ver=$1
+    local tested_ver=$2
+
+    if [ -z "$(get_bugfix $rule_ver)" ] || rule_ge $rule_ver $tested_ver; then
+        local rule_major=$(get_major $rule_ver)
+        local rule_minor=$(get_minor $rule_ver)
+
+        if [ -n "$rule_minor" ] && rule_eq $rule_major.$rule_minor $tested_ver; then
+            return 0
+        fi
+        if [ -z "$rule_minor" ] && rule_eq $rule_major $tested_ver; then
+            return 0
+        fi
+    fi
+
+    return 1
 }
 
 if [ $# -eq 0 ]; then
