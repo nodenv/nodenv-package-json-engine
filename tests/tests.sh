@@ -162,7 +162,7 @@ describe 'reslove_rule'
     assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
 
 describe 'normalize_rules'
-    RET="$(normalize_rules '  \t  >\t\t1.2.3.4-abc.def+a   \t 123.123   -\t\t\t  v5.3.2  ~ \tv5.5.x  ')"
+    RET="$(normalize_rules '  \t  >	\t1.2.3.4-abc.def+a   \t	123.123   -\t\t\t  v5.3.2  ~ \tv5.5.x  ')"
     assert "$RET" '>1.2.3.4-abc.def+a 123.123_-_5.3.2 ~5.5.*'
 
 describe 'read_rule'

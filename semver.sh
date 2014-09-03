@@ -205,7 +205,8 @@ regex_match()
 normalize_rules()
 {
     echo " $1" \
-        | sed 's/\t/ /g' \
+        | sed 's/\\t/ /g' \
+        | sed 's/	/ /g' \
         | sed 's/ \{2,\}/ /g' \
         | sed 's/ - /_-_/g' \
         | sed 's/\([~^<>=]\) /\1/g' \
