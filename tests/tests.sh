@@ -51,14 +51,30 @@ describe 'semver_eq'
     assert $? 1
 
 describe 'semver_lt'
-    semver_lt 1.2.2 1.2.3
-    assert $? 0
+    assert_lt()
+    {
+        local msg="$1 < $2 => $3"
+        semver_lt $1 $2
+        assert $? $3 "$msg"
+    }
 
-    semver_lt 1.2.3 1.2.3
-    assert $? 1
-
-    semver_lt 1.2.4 1.2.3
-    assert $? 1
+    assert_lt 1.2.2 1.2.3 0
+    assert_lt 1.2.3 1.2.3 1
+    assert_lt 1.2.4 1.2.3 1
+    assert_lt 1.0.0-alpha 1.0.0-alpha.1 0
+    assert_lt 1.0.0-alpha.1 1.0.0-alpha 1
+    assert_lt 1.0.0-alpha.1 1.0.0-alpha.beta 0
+    assert_lt 1.0.0-alpha.beta 1.0.0-alpha.1 1
+    assert_lt 1.0.0-alpha.beta 1.0.0-beta 0
+    assert_lt 1.0.0-beta 1.0.0-alpha.beta 1
+    assert_lt 1.0.0-beta 1.0.0-beta.2 0
+    assert_lt 1.0.0-beta.2 1.0.0-beta 1
+    assert_lt 1.0.0-beta.2 1.0.0-beta.11 0
+    assert_lt 1.0.0-beta.11 1.0.0-beta.2 1
+    assert_lt 1.0.0-beta.11 1.0.0-rc.1 0
+    assert_lt 1.0.0-rc.1 1.0.0-beta.11 1
+    assert_lt 1.0.0-rc.1 1.0.0 0
+    assert_lt 1.0.0 1.0.0-rc.1 1
 
 describe 'semver_le'
     semver_le 1.2.2 1.2.3

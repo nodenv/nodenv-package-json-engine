@@ -105,8 +105,9 @@ semver_lt()
 {
     local number_a=$(get_number $1)
     local number_b=$(get_number $2)
-    local labels_a=$(get_prerelease $1)
-    local labels_b=$(get_prerelease $2)
+    local prerelease_a=$(get_prerelease $1)
+    local prerelease_b=$(get_prerelease $2)
+
 
     local head_a=''
     local head_b=''
@@ -133,9 +134,46 @@ semver_lt()
         fi
     done
 
-    if [ -n "$labels_a" ] && [ -z "$labels_b" ]; then
+    if [ -n "$prerelease_a" ] && [ -z "$prerelease_b" ]; then
         return 0
+    elif [ -z "$prerelease_a" ] && [ -n "$prerelease_b" ]; then
+        return 1
     fi
+
+    local head_a=''
+    local head_b=''
+    local rest_a=$prerelease_a.
+    local rest_b=$prerelease_b.
+    while [ -n "$rest_a" ] || [ -n "$rest_b" ]; do
+        head_a=${rest_a%%.*}
+        head_b=${rest_b%%.*}
+        rest_a=${rest_a#*.}
+        rest_b=${rest_b#*.}
+
+        if [ -z "$head_a" ] && [ -n "$head_b" ]; then
+            return 0
+        elif [ -n "$head_a" ] && [ -z "$head_b" ]; then
+            return 1
+        fi
+
+        if [ "$head_a" = "$head_b" ]; then
+            continue
+        fi
+
+        # If both are numbers then compare numerically
+        if [ "$head_a" = "${head_a%[!0-9]*}" ] && [ "$head_b" = "${head_b%[!0-9]*}" ]; then
+            [ "$head_a" -lt "$head_b" ] && return 0 || return 1
+        # If only a is a number then return true (number has lower precedence than strings)
+        elif [ "$head_a" = "${head_a%[!0-9]*}" ]; then
+            return 0
+        # If only b is a number then return false
+        elif [ "$head_b" = "${head_b%[!0-9]*}" ]; then
+            return 1
+        # Finally if of identifiers is a number compare them lexically
+        else
+            [ "$head_a" '<' "$head_b" ] && return 0 || return 1
+        fi
+    done
 
     return 1
 }
