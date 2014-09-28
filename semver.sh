@@ -253,7 +253,7 @@ normalize_rules()
         | sed 's/ - /_-_/g' \
         | sed 's/\([~^<>=]\) /\1/g' \
         | sed 's/\([ _~^<>=]\)v/\1/g' \
-        | sed 's/x/*/g' \
+        | sed 's/x/*/gi' \
         | sed 's/^ //g' \
         | sed 's/ $//g'
 }

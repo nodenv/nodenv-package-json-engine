@@ -17,11 +17,37 @@ There are five basic comparators:
 * Greater than or equal to ``>=A.B.C``
 
 ### Advanced comparators
-##### Wildcard ``*`` ``*.*`` ``*.*.*``
+
+##### Wildcards ``*`` ``*.*`` ``*.*.*``
+Wildcard comparators can be satisfied by any version, even prerelease one.
+
+Instead of ``*`` character can be used ``x`` or ``X``.
+
 ##### Wildcard ranges ``A.*.*`` ``A.B.*``
-##### Caret with ``^A.B.C`` ``^A.B`` ``^A``
+Wildcard ranges can be satisfied when only part of version is matching. In contrast to wildcards, wildcard ranges cannot be satisfied by prerelease versions.
+
+* ``A.*.*`` is satisfied when majors are the same,
+* ``A.B.*`` is satisfied when majors and minors are the same.
+
+The special character (``*``, ``x`` or ``X``) is optional.
+
+###### Examples
+* ``1.2`` := ``>=1.2.0 <1.3.0``
+* ``5.*.*`` := ``>=5.0.0 <6.0.0``
+
+##### Caret ranges ``^A.B.C``
+Matches to compatible versions.
+
+###### Examples
+* ``^1.2.3`` := ``>=1.2.3 <2.0.0``
+* ``^0.1.2`` := ``>=0.1.2 <0.2.0``
+* ``^0.0.1`` := ``>=0.0.1 <0.0.2``
+
 ##### Tilde ranges ``~A.B.C`` ``~A.B`` ``~A``
+If patch version is specified tilde ranges matches to all greater or equal versions with the same minor version. Otherwise is equivalent of ``A.B.*`` when minor version is specified or ``A.*.*`` when not.
+
 ##### Hyphen ranges ``A.B.C - X.Y.Z``
+Hyphen range ``A.B.C - X.Y.Z`` equivalent of ``>=A.B.C <=X.Y.Z``.
 
 ### Prerelease versions
 Prerelease versions can satisfy comparators set only when have the same minor major and patch numbers as at least one of comparators.
