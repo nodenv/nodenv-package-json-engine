@@ -98,7 +98,11 @@ semver_eq()
         local count=$(( count + 1 ))
     done
 
-    return 0
+    if [ "$(get_prerelease $1)" = "$(get_prerelease $2)" ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 semver_lt()
@@ -287,7 +291,9 @@ resolve_rule()
 
     while read_rule "$rules" rule; do
         case "$rule" in
-            '*')     echo ge 0.0.0-0;;
+            '*')     echo all;;
+            '*.*')   echo all;;
+            '*.*.*') echo all;;
             '#')     echo eq $RULEVER_1;;
             '=#')    echo eq $RULEVER_1;;
             '<#')    echo lt $RULEVER_1;;
@@ -300,7 +306,6 @@ resolve_rule()
             '^#')    echo caret $RULEVER_1;;
             '#.*')   echo eq $RULEVER_1;;
             '#.*.*') echo eq $RULEVER_1;;
-            '*.*.*') echo ge 0.0.0-0;;
             *)       return 1
         esac
     done
@@ -308,22 +313,24 @@ resolve_rule()
 
 rule_eq()
 {
-    semver_eq $2 $1 && return 0 || return 1;
+    local rule_ver=$1
+    local tested_ver=$2
+
+    semver_eq $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_le()
 {
-    semver_le $2 $1 && return 0 || return 1;
+    local rule_ver=$1
+    local tested_ver=$2
+
+    semver_le $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_lt()
 {
     local rule_ver=$1
     local tested_ver=$2
-
-    if [ -n "$(get_bugfix $rule_ver)" ] && [ -z "$(get_prerelease $rule_ver)" ]; then
-        rule_ver="$rule_ver-0"
-    fi
 
     semver_lt $tested_ver $rule_ver && return 0 || return 1;
 }
@@ -333,16 +340,15 @@ rule_ge()
     local rule_ver=$1
     local tested_ver=$2
 
-    if [ -n "$(get_bugfix $rule_ver)" ] && [ -z "$(get_prerelease $rule_ver)" ]; then
-        rule_ver="$rule_ver-0"
-    fi
-
     semver_ge $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_gt()
 {
-    semver_gt $2 $1 && return 0 || return 1;
+    local rule_ver=$1
+    local tested_ver=$2
+
+    semver_gt $tested_ver $rule_ver && return 0 || return 1;
 }
 
 rule_tilde()
@@ -350,14 +356,14 @@ rule_tilde()
     local rule_ver=$1
     local tested_ver=$2
 
-    if [ -z "$(get_bugfix $rule_ver)" ] || rule_ge $rule_ver $tested_ver; then
+    if rule_ge $rule_ver $tested_ver; then
         local rule_major=$(get_major $rule_ver)
         local rule_minor=$(get_minor $rule_ver)
 
-        if [ -n "$rule_minor" ] && rule_eq $rule_major.$rule_minor $tested_ver; then
+        if [ -n "$rule_minor" ] && rule_eq $rule_major.$rule_minor $(get_number $tested_ver); then
             return 0
         fi
-        if [ -z "$rule_minor" ] && rule_eq $rule_major $tested_ver; then
+        if [ -z "$rule_minor" ] && rule_eq $rule_major $(get_number $tested_ver); then
             return 0
         fi
     fi
@@ -370,19 +376,25 @@ rule_caret()
     local rule_ver=$1
     local tested_ver=$2
 
-    if [ -z "$(get_bugfix $rule_ver)" ] || rule_ge $rule_ver $tested_ver; then
+    if rule_ge $rule_ver $tested_ver; then
         local rule_major=$(get_major $rule_ver)
 
-        if [ "$rule_major" != "0" ] && rule_eq $rule_major $tested_ver; then
+        if [ "$rule_major" != "0" ] && rule_eq $rule_major $(get_number $tested_ver); then
             return 0
         fi
-        if [ "$rule_major" = "0" ] && rule_eq $rule_ver $tested_ver; then
+        if [ "$rule_major" = "0" ] && rule_eq $rule_ver $(get_number $tested_ver); then
             return 0
         fi
     fi
 
     return 1
 }
+
+rule_all()
+{
+    return 0
+}
+
 
 if [ $# -eq 0 ]; then
     echo "Usage:    $0 -r <rule> <version> [<version>... ]"
@@ -425,7 +437,12 @@ while [ -n "$rules_string" ]; do
         ver=`echo "$ver" | grep -E -x "$RE_VER"`
 
         success=true
+        allow_prerel=false
         while read -r rule; do
+            if [ -n "$(get_prerelease ${rule#* })" ] && semver_eq "$(get_number ${rule#* })" "$(get_number $ver)" || [ "$rule" = "all" ]; then
+                allow_prerel=true
+            fi
+
             rule_$rule "$ver"
             if [ $? -eq 1 ]; then
                 success=false
@@ -437,8 +454,10 @@ $rules
 EOF
 
         if $success; then
-            if [ -z "$max" ] || semver_lt "$max" "$ver"; then
-                max="$ver"
+            if [ -z "$(get_prerelease $ver)" ] || $allow_prerel; then
+                if [ -z "$max" ] || semver_lt "$max" "$ver"; then
+                    max="$ver"
+                fi
             fi
         fi
     done

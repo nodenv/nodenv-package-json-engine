@@ -160,7 +160,7 @@ describe 'reslove_rule'
     assert "$RET" "tilde 1.2.3"                             "Tilde (~1.2.3)"
 
     RET=$(resolve_rule '*')
-    assert "$RET" "ge 0.0.0-0"                              "Wildcard (*)"
+    assert "$RET" "all"                                     "Wildcard (*)"
 
     RET=$(resolve_rule '1.2.x')
     assert "$RET" "eq 1.2"                                  "Wildcard (1.2.x)"
@@ -172,7 +172,7 @@ describe 'reslove_rule'
     assert "$RET" "eq 1"                                    "Wildcard (1.*.*)"
 
     RET=$(resolve_rule '*.*.*')
-    assert "$RET" "ge 0.0.0-0"                              "Wildcard (*.*.*)"
+    assert "$RET" "all"                                     "Wildcard (*.*.*)"
 
     RET=$(resolve_rule '^1.2.3')
     assert "$RET" "caret 1.2.3"                             "Caret (^1.2.3)"
