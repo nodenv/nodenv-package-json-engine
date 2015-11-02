@@ -26,6 +26,10 @@ Homebrew.*
 $ brew install --HEAD nodenv-package-json-engine
 ```
 
+## Usage
+
+Once you've installed the plugin you can verify that it's working by `cd`ing into a project that has a `package.json` file with `engines` and does not have a `.node-version` file.  From anywhere in the project's tree, run `nodenv which node`.
+
 ## Contributing
 
 To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/OiNutter/nodenv), then run `bats test`  in the base directory of this plugin
