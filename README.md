@@ -23,7 +23,7 @@ Mac OS X users can install [many nodenv plugins](https://github.com/jawshooah/ho
 Homebrew.*
 
 ```sh
-$ brew install --HEAD nodenv-package-json-engine
+$ brew install nodenv-package-json-engine
 ```
 
 ## Usage
