@@ -1,12 +1,30 @@
 # nodenv-package-json-engine
 
 This is a plugin for [nodenv](https://github.com/OiNutter/nodenv)
-that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json.
-before spawning Node processes.
+that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. `.node-version` files still take precedence.
 
 It attempts to resolve complex [semver ranges](https://docs.npmjs.com/misc/semver#ranges) via the [semver.io](http://semver.io/) web service.  Simple versions, like "0.12.7", are resolved without a network request.
 
 [![Travis](https://img.shields.io/travis/hurrymaplelad/nodenv-package-json-engine.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/nodenv-package-json-engine)
+
+## Installation
+
+### Installing with git
+
+```sh
+$ git clone https://github.com/hurrymaplelad/nodenv-package-json-engine.git $(nodenv root)/plugins/nodenv-package-json-engine
+```
+
+### Installing with Homebrew
+
+Mac OS X users can install [many nodenv plugins](https://github.com/jawshooah/homebrew-nodenv) with [Homebrew](http://brew.sh). T
+
+*This is the recommended method of installation if you installed nodenv with
+Homebrew.*
+
+```sh
+$ brew install --HEAD nodenv-package-json-engine
+```
 
 ## Contributing
 
