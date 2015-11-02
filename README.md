@@ -6,8 +6,12 @@ before spawning Node processes.
 
 It attempts to resolve complex [semver ranges](https://docs.npmjs.com/misc/semver#ranges) via the [semver.io](http://semver.io/) web service.  Simple versions, like "0.12.7", are resolved without a network request.
 
+## Contributing
+
+To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/OiNutter/nodenv), then run `bats test`  in the base directory of this plugin
+
 ## Credits
 
-Package.json inspection and Semver.io integration inspired by nvmish[[1]](https://github.com/goodeggs/homebrew-delivery-eng/blob/master/nvmish.sh)[[2]](https://gist.github.com/assaf/ee377a186371e2e269a7).
+Package.json inspection and Semver.io integration heavily inspired by nvmish[[1]](https://github.com/goodeggs/homebrew-delivery-eng/blob/master/nvmish.sh)[[2]](https://gist.github.com/assaf/ee377a186371e2e269a7).
 
-Nodenv plugin hooks integration inspired by [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
+Nodenv plugin hooks integration and tests heavily inspired by [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
