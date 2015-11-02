@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# If a custom Node version is not already defined, this
+# looks for a Node version in the current tree's package.json
+# and prints out that version.
+
+find_package_json_path() {
+  local root="$1"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/package.json" ]; then
+      echo "${root}/package.json"
+      exit
+    fi
+    root="${root%/*}"
+  done
+}
+
+should_find_in_package_json() {
+  [ -z "$(nodenv local 2>/dev/null)" ]
+}
+
+version_from_package_json() {
+  local version_regex='"node":[ \t]*"([^"]*)"'
+  [[ `cat $PACKAGE_JSON_PATH` =~ $version_regex ]]
+  local version="${BASH_REMATCH[1]}"
+
+  if [[ -n "$version" ]] ; then
+    local simple_regex="^[0-9]+\.[0-9]+\.[0-9]+$"
+    if ! [[ "$version" =~ $simple_regex ]]; then
+      version=$(curl --silent --get --data-urlencode "range=${version}" https://semver.herokuapp.com/node/resolve)
+    fi
+    echo $version
+  fi
+}
+
+if should_find_in_package_json; then
+  PACKAGE_JSON_PATH=$(find_package_json_path "$PWD")
+
+  if [ -e "$PACKAGE_JSON_PATH" ]; then
+    version_from_package_json
+  fi
+fi
