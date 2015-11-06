@@ -20,16 +20,17 @@ should_find_in_package_json() {
 }
 
 version_from_package_json() {
-  local version_regex='"node":[ \t]*"([^"]*)"'
+  local version_regex='"(node|iojs)":[ \t]*"([^"]*)"'
   [[ `cat $PACKAGE_JSON_PATH` =~ $version_regex ]]
-  local version="${BASH_REMATCH[1]}"
+  local engine="${BASH_REMATCH[1]}"
+  local version="${BASH_REMATCH[2]}"
 
-  if [[ -n "$version" ]] ; then
+  if [ -n "$engine" ] && [ -n "$version" ]; then
     local simple_regex="^[0-9]+\.[0-9]+\.[0-9]+$"
     if ! [[ "$version" =~ $simple_regex ]]; then
-      version=$(curl --silent --get --data-urlencode "range=${version}" https://semver.herokuapp.com/node/resolve)
+      version=$(curl --silent --get --data-urlencode "range=${version}" https://semver.herokuapp.com/${engine}/resolve)
     fi
-    echo $version
+    echo "$engine-$version"
   fi
 }
 
