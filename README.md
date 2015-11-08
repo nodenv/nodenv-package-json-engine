@@ -17,12 +17,13 @@ $ git clone https://github.com/hurrymaplelad/nodenv-package-json-engine.git $(no
 
 ### Installing with Homebrew
 
-Mac OS X users can install [many nodenv plugins](https://github.com/jawshooah/homebrew-nodenv) with [Homebrew](http://brew.sh). T
+Mac OS X users can install [many nodenv plugins](https://github.com/jawshooah/homebrew-nodenv) with [Homebrew](http://brew.sh).
 
 *This is the recommended method of installation if you installed nodenv with
 Homebrew.*
 
 ```sh
+$ brew tap jawshooah/nodenv
 $ brew install nodenv-package-json-engine
 ```
 
