@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 #
-# If a custom Node version is not already defined, this
-# looks for a Node version in the current tree's package.json
-# and prints out that version.
+# If a custom Node version is not already defined, we look
+# for a Node version semver expressing in the current tree's package.json.
+# If we find a fixed version, we print it out.  If we find a range we
+# test the installed versions against that range and print the
+# greatest matching version.
+
+# Setup for relative includes
+# http://stackoverflow.com/a/12694189/407845
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 
 find_package_json_path() {
   local root="$1"
@@ -22,14 +29,19 @@ should_find_in_package_json() {
 version_from_package_json() {
   local version_regex='"node":[ \t]*"([^"]*)"'
   [[ `cat $PACKAGE_JSON_PATH` =~ $version_regex ]]
-  local version="${BASH_REMATCH[1]}"
+  local version_expression="${BASH_REMATCH[1]}"
 
-  if [[ -n "$version" ]] ; then
-    local simple_regex="^[0-9]+\.[0-9]+\.[0-9]+$"
-    if ! [[ "$version" =~ $simple_regex ]]; then
-      version=$(curl --silent --get --data-urlencode "range=${version}" https://semver.herokuapp.com/node/resolve)
+  if [[ -n "$version_expression" ]] ; then
+    installed_versions=$(nodenv versions --bare | xargs)
+    version=$($DIR/../deps/semver.sh \
+      -r "$version_expression" $installed_versions \
+      | tail -n 1)
+    if [[ -n "$version" ]] ; then
+      echo $version
+    else
+      echo "$version_expression"
+      exit 1
     fi
-    echo $version
   fi
 }
 
