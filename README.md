@@ -3,7 +3,7 @@
 This is a plugin for [nodenv](https://github.com/OiNutter/nodenv)
 that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. `.node-version` files still take precedence.
 
-It attempts to resolve complex [semver ranges](https://docs.npmjs.com/misc/semver#ranges) via the [semver.io](http://semver.io/) web service.  Simple versions, like "0.12.7", are resolved without a network request.
+When engines is configured with a range this plugin chooses the greatest installed version matching the range or exits with an error if none match.
 
 [![Travis](https://img.shields.io/travis/hurrymaplelad/nodenv-package-json-engine.svg?style=flat-square)](https://travis-ci.org/hurrymaplelad/nodenv-package-json-engine)
 
@@ -40,3 +40,5 @@ To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](h
 Package.json inspection and Semver.io integration heavily inspired by nvmish[[1]](https://github.com/goodeggs/homebrew-delivery-eng/blob/master/nvmish.sh)[[2]](https://gist.github.com/assaf/ee377a186371e2e269a7).
 
 Nodenv plugin hooks integration and tests heavily inspired by [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
+
+Shell semver range support provided by [sh-semver](https://github.com/qzb/sh-semver).
