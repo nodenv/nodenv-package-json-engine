@@ -28,7 +28,7 @@ should_find_in_package_json() {
 
 version_from_package_json() {
   local version_regex='"node":[ \t]*"([^"]*)"'
-  [[ `cat $PACKAGE_JSON_PATH` =~ $version_regex ]]
+  [[ $(cat "$PACKAGE_JSON_PATH") =~ $version_regex ]]
   local version_expression="${BASH_REMATCH[1]}"
 
   if [[ -n "$version_expression" ]] ; then
@@ -37,7 +37,7 @@ version_from_package_json() {
       -r "$version_expression" $installed_versions \
       | tail -n 1)
     if [[ -n "$version" ]] ; then
-      echo $version
+      echo "$version"
     else
       echo "$version_expression"
       exit 1
