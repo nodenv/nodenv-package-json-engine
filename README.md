@@ -1,6 +1,6 @@
 # nodenv-package-json-engine
 
-This is a plugin for [nodenv](https://github.com/OiNutter/nodenv)
+This is a plugin for [nodenv](https://github.com/nodenv/nodenv)
 that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. `.node-version` files still take precedence.
 
 When engines is configured with a range this plugin chooses the greatest installed version matching the range or exits with an error if none match.
@@ -33,7 +33,7 @@ Once you've installed the plugin you can verify that it's working by `cd`ing int
 
 ## Contributing
 
-To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/OiNutter/nodenv), then run `bats test`  in the base directory of this plugin
+To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/nodenv/nodenv), then run `bats test`  in the base directory of this plugin
 
 ## Credits
 
