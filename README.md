@@ -1,6 +1,6 @@
 # nodenv-package-json-engine
 
-This is a plugin for [nodenv](https://github.com/OiNutter/nodenv)
+This is a plugin for [nodenv](https://github.com/nodenv/nodenv)
 that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. `.node-version` files still take precedence.
 
 When engines is configured with a range this plugin chooses the greatest installed version matching the range or exits with an error if none match.
@@ -17,13 +17,13 @@ $ git clone https://github.com/hurrymaplelad/nodenv-package-json-engine.git $(no
 
 ### Installing with Homebrew
 
-Mac OS X users can install [many nodenv plugins](https://github.com/jawshooah/homebrew-nodenv) with [Homebrew](http://brew.sh).
+Mac OS X users can install [many nodenv plugins](https://github.com/nodenv/homebrew-nodenv) with [Homebrew](http://brew.sh).
 
 *This is the recommended method of installation if you installed nodenv with
 Homebrew.*
 
 ```sh
-$ brew tap jawshooah/nodenv
+$ brew tap nodenv/nodenv
 $ brew install nodenv-package-json-engine
 ```
 
@@ -33,7 +33,7 @@ Once you've installed the plugin you can verify that it's working by `cd`ing int
 
 ## Contributing
 
-To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/OiNutter/nodenv), then run `bats test`  in the base directory of this plugin
+To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/nodenv/nodenv), then run `bats test`  in the base directory of this plugin
 
 ## Credits
 
