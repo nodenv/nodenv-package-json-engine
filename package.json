@@ -1,0 +1,30 @@
+{
+  "name": "nodenv-package-json-engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Activate a nodenv node version from package.json engines",
+  "homepage": "https://github.com/jasonkarns/nodenv-package-json-engine#readme",
+  "license": "MIT",
+  "author": "Adam Hull (http://hurrymaplelad.com)",
+  "contibutors": [
+    "Jason Karns <jason@karns.name> (http://jason.karns.name)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonkarns/nodenv-package-json-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jasonkarns/nodenv-package-json-engine/issues"
+  },
+  "directories": {
+    "bin": "bin",
+    "test": "test"
+  },
+  "scripts": {
+    "publish:brew": "brew-publish $npm_package_name v$npm_package_version",
+    "postversion": "git push origin master v$npm_package_version && npm run publish:brew"
+  },
+  "devDependencies": {
+    "brew-publish": "git+https://github.com/jasonkarns/brew-publish.git#nodenv-tap"
+  }
+}
