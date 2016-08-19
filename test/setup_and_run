@@ -1,8 +1,0 @@
-#!/bin/bash
-
-NODENV_TAG=v0.4.0
-
-git clone --depth 1 --branch $NODENV_TAG https://github.com/nodenv/nodenv.git
-
-export PATH="$PWD/nodenv/bin:$PATH"
-exec bats --tap test/$1
