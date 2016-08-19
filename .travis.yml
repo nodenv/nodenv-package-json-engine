@@ -1,2 +1,2 @@
-language: c # skip unnecessary node-specific setup
-script: test/setup_and_run
+language: node_js
+node_js: node
