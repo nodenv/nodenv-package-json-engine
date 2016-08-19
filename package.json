@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Activate a nodenv node version from package.json engines",
-  "homepage": "https://github.com/jasonkarns/nodenv-package-json-engine#readme",
+  "homepage": "https://github.com/nodenv/nodenv-package-json-engine#readme",
   "license": "MIT",
   "author": "Adam Hull (http://hurrymaplelad.com)",
   "contibutors": [
@@ -11,10 +11,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/jasonkarns/nodenv-package-json-engine.git"
+    "url": "https://github.com/nodenv/nodenv-package-json-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/jasonkarns/nodenv-package-json-engine/issues"
+    "url": "https://github.com/nodenv/nodenv-package-json-engine/issues"
   },
   "directories": {
     "bin": "bin",
