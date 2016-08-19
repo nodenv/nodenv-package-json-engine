@@ -291,57 +291,37 @@ normalize_rules()
 }
 
 # Reads rule from provided string
-read_rule()
-{
-    RULEIND=$(( RULEIND + 1 ))
-
-    local _rule _idnt _vers
-    _rule="$( echo "$1 " | cut -d ' ' -f $RULEIND  )"
-    _idnt="$( echo "$_rule" | sed "s/$BRE_VER/#/g" )"
-    _vers="$( echo "$_rule" | grep -o "$BRE_VER"   )"
-
-    # if rule is empty - there is no more rules
-    if [ -z "$_rule" ]; then
-        return 1
-    fi
-
-    local _i=1;
-    for ver in $_vers; do
-        eval "RULEVER_$_i='$ver'"
-        _i=$(( _i + 1 ))
-    done
-
-    # set global variable
-    eval "$2='$_idnt'"
-}
-
 resolve_rule()
 {
-    RULEIND=0
+    local rule operator operands
+    rule="$1"
+    operator="$( echo "$rule" | sed "s/$BRE_VER/#/g" )"
+    operands=( $( echo "$rule" | grep -o "$BRE_VER") )
 
+    case "$operator" in
+        '*')     echo "all" ;;
+        '#')     echo "eq ${operands[0]}" ;;
+        '=#')    echo "eq ${operands[0]}" ;;
+        '<#')    echo "lt ${operands[0]}" ;;
+        '>#')    echo "gt ${operands[0]}" ;;
+        '<=#')   echo "le ${operands[0]}" ;;
+        '>=#')   echo "ge ${operands[0]}" ;;
+        '#_-_#') echo "ge ${operands[0]}"
+                 echo "le ${operands[1]}" ;;
+        '~#')    echo "tilde ${operands[0]}" ;;
+        '^#')    echo "caret ${operands[0]}" ;;
+        *)       return 1
+    esac
+}
+
+resolve_rules()
+{
     local rules
     rules="$(normalize_rules "$1")"
+    IFS=' ' read -ra rules <<< "${rules:-all}"
 
-    if [ -z "$rules" ]; then
-        echo all
-        return
-    fi
-
-    while read_rule "$rules" rule; do
-        case "$rule" in
-            '*')     echo "all";;
-            '#')     echo "eq $RULEVER_1";;
-            '=#')    echo "eq $RULEVER_1";;
-            '<#')    echo "lt $RULEVER_1";;
-            '>#')    echo "gt $RULEVER_1";;
-            '<=#')   echo "le $RULEVER_1";;
-            '>=#')   echo "ge $RULEVER_1";;
-            '#_-_#') echo "ge $RULEVER_1"
-                     echo "le $RULEVER_2";;
-            '~#')    echo "tilde $RULEVER_1";;
-            '^#')    echo "caret $RULEVER_1";;
-            *)       return 1
-        esac
+    for rule in "${rules[@]}"; do
+        resolve_rule "$rule"
     done
 }
 
@@ -470,7 +450,7 @@ for ver in $versions; do
             #continue
         #fi
 
-        rules="$(resolve_rule "$head")"
+        rules="$(resolve_rules "$head")"
 
         # If specified rule cannot be recognised - end with error
         if [ $? -eq 1 ]; then
