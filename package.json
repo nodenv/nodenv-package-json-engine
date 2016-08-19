@@ -27,6 +27,7 @@
     "postversion": "git push --follow-tags && npm run publish:brew"
   },
   "devDependencies": {
+    "bats": "^0.4.2",
     "brew-publish": "^2.0.0"
   }
 }
