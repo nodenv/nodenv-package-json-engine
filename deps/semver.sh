@@ -19,13 +19,13 @@ filter()
     local text="$1"
     local regex="$2"
     shift 2
-    echo "$text" | grep -E $@ "$regex"
+    echo "$text" | grep -E "$@" "$regex"
 }
 
 # Gets number part from normalized version
 get_number()
 {
-    echo ${1%%-*}
+    echo "${1%%-*}"
 }
 
 # Gets prerelase part from normalized version
@@ -36,14 +36,14 @@ get_prerelease()
     if [ "$pre" = "$1" ]; then
         echo
     else
-        echo $pre
+        echo "$pre"
     fi
 }
 
 # Gets major number from normalized version
 get_major()
 {
-    echo ${1%%.*}
+    echo "${1%%.*}"
 }
 
 # Gets minor number from normalized version
@@ -56,7 +56,7 @@ get_minor()
     if [ "$minor" = "$minor_major" ]; then
         echo
     else
-        echo $minor
+        echo "$minor"
     fi
 }
 
@@ -68,24 +68,25 @@ get_bugfix()
     if [ "$bugfix" = "$minor_major_bug" ]; then
         echo
     else
-        echo $bugfix
+        echo "$bugfix"
     fi
 }
 
 strip_metadata()
 {
-    echo ${1%+*}
+    echo "${1%+*}"
 }
 
 semver_eq()
 {
-    local ver1=$(get_number $1)
-    local ver2=$(get_number $2)
+    local ver1 ver2 part1 part2
+    ver1=$(get_number "$1")
+    ver2=$(get_number "$2")
 
     local count=1
     while true; do
-        local part1=$(echo $ver1'.' | cut -d '.' -f $count)
-        local part2=$(echo $ver2'.' | cut -d '.' -f $count)
+        part1=$(echo "$ver1"'.' | cut -d '.' -f $count)
+        part2=$(echo "$ver2"'.' | cut -d '.' -f $count)
 
         if [ -z "$part1" ] || [ -z "$part2" ]; then
             break
@@ -98,7 +99,7 @@ semver_eq()
         local count=$(( count + 1 ))
     done
 
-    if [ "$(get_prerelease $1)" = "$(get_prerelease $2)" ]; then
+    if [ "$(get_prerelease "$1")" = "$(get_prerelease "$2")" ]; then
         return 0
     else
         return 1
@@ -107,10 +108,11 @@ semver_eq()
 
 semver_lt()
 {
-    local number_a=$(get_number $1)
-    local number_b=$(get_number $2)
-    local prerelease_a=$(get_prerelease $1)
-    local prerelease_b=$(get_prerelease $2)
+    local number_a number_b prerelease_a prerelease_b
+    number_a=$(get_number "$1")
+    number_b=$(get_number "$2")
+    prerelease_a=$(get_prerelease "$1")
+    prerelease_b=$(get_prerelease "$2")
 
 
     local head_a=''
@@ -175,7 +177,7 @@ semver_lt()
             return 1
         # Finally if of identifiers is a number compare them lexically
         else
-            [ "$head_a" '<' "$head_b" ] && return 0 || return 1
+            test "$head_a" \< "$head_b" && return 0 || return 1
         fi
     done
 
@@ -204,32 +206,35 @@ semver_ge()
 semver_sort()
 {
     if [ $# -le 1 ]; then
-        echo $1
+        echo "$1"
         return
     fi
 
     local pivot=$1
-    local args_a=""
-    local args_b=""
+    local args_a=()
+    local args_b=()
 
     shift 1
 
-    for ver in $@; do
-        if semver_le $ver $pivot; then
-            args_a="$args_a $ver"
+    for ver in "$@"; do
+        if semver_le "$ver" "$pivot"; then
+            args_a=( "${args_a[@]}" "$ver" )
         else
-            args_b="$ver $args_b"
+            args_b=( "$ver" "${args_b[@]}" )
         fi
     done
 
-    echo $(semver_sort $args_a) $pivot $(semver_sort $args_b)
+    args_a=( $(semver_sort "${args_a[@]}") )
+    args_b=( $(semver_sort "${args_b[@]}") )
+    echo "${args_a[@]}" "$pivot" "${args_b[@]}"
 }
 
 regex_match()
 {
     local string="$1 "
     local regexp="$2"
-    local match="$(eval "echo '$string' | grep -E -o '^[ \t]*($regexp)[ \t]+'")";
+    local match
+    match="$(eval "echo '$string' | grep -E -o '^[ \t]*($regexp)[ \t]+'")";
 
     for i in $(seq 0 9); do
         unset "MATCHED_VER_$i"
@@ -241,14 +246,15 @@ regex_match()
         return 1
     fi
 
-    local match_len=$(echo "$match" | wc -c)
-    REST=`echo "$string" | cut -c $match_len-`
+    local match_len=${#match}
+    REST="${string:$match_len}"
 
     local part
     local i=1
-    for part in $(echo $string); do
-        local ver="$(eval "echo '$part' | grep -E -o '$RE_VER'   | head -n 1 | sed 's/ \t//g'")";
-        local num=$(get_number "$ver")
+    for part in $string; do
+        local ver num
+        ver="$(eval "echo '$part' | grep -E -o '$RE_VER'   | head -n 1 | sed 's/ \t//g'")";
+        num=$(get_number "$ver")
 
         if [ -n "$ver" ]; then
             eval "MATCHED_VER_$i='$ver'"
@@ -287,11 +293,12 @@ normalize_rules()
 # Reads rule from provided string
 read_rule()
 {
-    RULEIND=$(( $RULEIND + 1 ))
+    RULEIND=$(( RULEIND + 1 ))
 
-    local _rule="$( echo "$1 " | cut -d ' ' -f $RULEIND  )"
-    local _idnt="$( echo "$_rule" | sed "s/$BRE_VER/#/g" )"
-    local _vers="$( echo "$_rule" | grep -o "$BRE_VER"   )"
+    local _rule _idnt _vers
+    _rule="$( echo "$1 " | cut -d ' ' -f $RULEIND  )"
+    _idnt="$( echo "$_rule" | sed "s/$BRE_VER/#/g" )"
+    _vers="$( echo "$_rule" | grep -o "$BRE_VER"   )"
 
     # if rule is empty - there is no more rules
     if [ -z "$_rule" ]; then
@@ -299,9 +306,9 @@ read_rule()
     fi
 
     local _i=1;
-    for ver in `echo $_vers`; do
+    for ver in $_vers; do
         eval "RULEVER_$_i='$ver'"
-        _i=$(( $_i + 1 ))
+        _i=$(( _i + 1 ))
     done
 
     # set global variable
@@ -312,7 +319,8 @@ resolve_rule()
 {
     RULEIND=0
 
-    local rules="$(normalize_rules "$1")"
+    local rules
+    rules="$(normalize_rules "$1")"
 
     if [ -z "$rules" ]; then
         echo all
@@ -321,17 +329,17 @@ resolve_rule()
 
     while read_rule "$rules" rule; do
         case "$rule" in
-            '*')     echo all;;
-            '#')     echo eq $RULEVER_1;;
-            '=#')    echo eq $RULEVER_1;;
-            '<#')    echo lt $RULEVER_1;;
-            '>#')    echo gt $RULEVER_1;;
-            '<=#')   echo le $RULEVER_1;;
-            '>=#')   echo ge $RULEVER_1;;
-            '#_-_#') echo ge $RULEVER_1
-                     echo le $RULEVER_2;;
-            '~#')    echo tilde $RULEVER_1;;
-            '^#')    echo caret $RULEVER_1;;
+            '*')     echo "all";;
+            '#')     echo "eq $RULEVER_1";;
+            '=#')    echo "eq $RULEVER_1";;
+            '<#')    echo "lt $RULEVER_1";;
+            '>#')    echo "gt $RULEVER_1";;
+            '<=#')   echo "le $RULEVER_1";;
+            '>=#')   echo "ge $RULEVER_1";;
+            '#_-_#') echo "ge $RULEVER_1"
+                     echo "le $RULEVER_2";;
+            '~#')    echo "tilde $RULEVER_1";;
+            '^#')    echo "caret $RULEVER_1";;
             *)       return 1
         esac
     done
@@ -339,57 +347,58 @@ resolve_rule()
 
 rule_eq()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    semver_eq $tested_ver $rule_ver && return 0 || return 1;
+    semver_eq "$tested_ver" "$rule_ver" && return 0 || return 1;
 }
 
 rule_le()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    semver_le $tested_ver $rule_ver && return 0 || return 1;
+    semver_le "$tested_ver" "$rule_ver" && return 0 || return 1;
 }
 
 rule_lt()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    semver_lt $tested_ver $rule_ver && return 0 || return 1;
+    semver_lt "$tested_ver" "$rule_ver" && return 0 || return 1;
 }
 
 rule_ge()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    semver_ge $tested_ver $rule_ver && return 0 || return 1;
+    semver_ge "$tested_ver" "$rule_ver" && return 0 || return 1;
 }
 
 rule_gt()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    semver_gt $tested_ver $rule_ver && return 0 || return 1;
+    semver_gt "$tested_ver" "$rule_ver" && return 0 || return 1;
 }
 
 rule_tilde()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    if rule_ge $rule_ver $tested_ver; then
-        local rule_major=$(get_major $rule_ver)
-        local rule_minor=$(get_minor $rule_ver)
+    if rule_ge "$rule_ver" "$tested_ver"; then
+        local rule_major rule_minor
+        rule_major=$(get_major "$rule_ver")
+        rule_minor=$(get_minor "$rule_ver")
 
-        if [ -n "$rule_minor" ] && rule_eq $rule_major.$rule_minor $(get_number $tested_ver); then
+        if [ -n "$rule_minor" ] && rule_eq "$rule_major.$rule_minor" "$(get_number "$tested_ver")"; then
             return 0
         fi
-        if [ -z "$rule_minor" ] && rule_eq $rule_major $(get_number $tested_ver); then
+        if [ -z "$rule_minor" ] && rule_eq "$rule_major" "$(get_number "$tested_ver")"; then
             return 0
         fi
     fi
@@ -399,16 +408,17 @@ rule_tilde()
 
 rule_caret()
 {
-    local rule_ver=$1
-    local tested_ver=$2
+    local rule_ver="$1"
+    local tested_ver="$2"
 
-    if rule_ge $rule_ver $tested_ver; then
-        local rule_major=$(get_major $rule_ver)
+    if rule_ge "$rule_ver" "$tested_ver"; then
+        local rule_major
+        rule_major="$(get_major "$rule_ver")"
 
-        if [ "$rule_major" != "0" ] && rule_eq $rule_major $(get_number $tested_ver); then
+        if [ "$rule_major" != "0" ] && rule_eq "$rule_major" "$(get_number "$tested_ver")"; then
             return 0
         fi
-        if [ "$rule_major" = "0" ] && rule_eq $rule_ver $(get_number $tested_ver); then
+        if [ "$rule_major" = "0" ] && rule_eq "$rule_ver" "$(get_number "$tested_ver")"; then
             return 0
         fi
     fi
@@ -435,10 +445,10 @@ while getopts ar:h o; do
     esac
 done
 
-shift $(( $OPTIND-1 ))
+shift $(( OPTIND-1 ))
 
 # Sort versions
-versions=$(semver_sort $@)
+versions="$(semver_sort "$@")"
 
 output=""
 
@@ -467,11 +477,11 @@ for ver in $versions; do
             exit 1
         fi
 
-        if [ -z `echo "$ver" | grep -E -x "[v=]?[ \t]*$RE_VER"` ]; then
+        if ! echo "$ver" | grep -q -E -x "[v=]?[ \t]*$RE_VER"; then
             continue
         fi
 
-        ver=`echo "$ver" | grep -E -x "$RE_VER"`
+        ver=$(echo "$ver" | grep -E -x "$RE_VER")
 
         success=true
         allow_prerel=false
@@ -480,11 +490,14 @@ for ver in $versions; do
         fi
 
         while read -r rule; do
-            if [ -n "$(get_prerelease ${rule#* })" ] && semver_eq "$(get_number ${rule#* })" "$(get_number $ver)" || [ "$rule" = "all" ]; then
+            comparator="${rule%% *}"
+            operand="${rule#* }"
+
+            if [ -n "$(get_prerelease "$operand")" ] && semver_eq "$(get_number "$operand")" "$(get_number "$ver")" || [ "$rule" = "all" ]; then
                 allow_prerel=true
             fi
 
-            rule_$rule "$ver"
+            "rule_$comparator" "$operand" "$ver"
             if [ $? -eq 1 ]; then
                 success=false
                 break
@@ -495,16 +508,16 @@ $rules
 EOF
 
         if $success; then
-            if [ -z "$(get_prerelease $ver)" ] || $allow_prerel; then
+            if [ -z "$(get_prerelease "$ver")" ] || $allow_prerel; then
                 output="$output$ver\n"
                 break;
             fi
         fi
     done
 
-    group=$(( $group + 1 ))
+    group=$(( group + 1 ))
 done
 
 if [ -n "$output" ]; then
-    printf $output
+    echo "$output"
 fi
