@@ -278,8 +278,8 @@ normalize_rules()
         | sed 's/ - /_-_/g' \
         | sed 's/\([~^<>=]\) /\1/g' \
         | sed 's/\([ _~^<>=]\)v/\1/g' \
-        | sed 's/\.[x*]//gi' \
-        | sed 's/x/*/gi' \
+        | sed 's/\.[xX*]//g' \
+        | sed 's/[xX]/*/g' \
         | sed 's/^ //g' \
         | sed 's/ $//g'
 }
