@@ -23,7 +23,7 @@
   "scripts": {
     "update:deps": "curl 'https://raw.githubusercontent.com/qzb/sh-semver/master/semver.sh' > deps/semver.sh",
     "publish:brew": "brew-publish $npm_package_name v$npm_package_version",
-    "postversion": "git push origin master v$npm_package_version && npm run publish:brew"
+    "postversion": "git push --follow-tags && npm run publish:brew"
   },
   "devDependencies": {
     "brew-publish": "^2.0.0"
