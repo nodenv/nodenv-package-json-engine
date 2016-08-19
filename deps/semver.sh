@@ -1,4 +1,4 @@
-#/usr/bin/env sh
+#!/usr/bin/env bash
 
 _num_part='([0-9]|[1-9][0-9]*)'
 _lab_part='([0-9]|[1-9][0-9]*|[0-9]*[a-zA-Z-][a-zA-Z0-9-]*)'
