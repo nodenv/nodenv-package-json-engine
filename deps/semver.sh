@@ -426,8 +426,10 @@ if [ $# -eq 0 ]; then
     echo "Usage:    $0 -r <rule> <version> [<version>... ]"
 fi
 
-while getopts r:h o; do
+force_allow_prerel=false
+while getopts ar:h o; do
     case "$o" in
+        a) force_allow_prerel=true ;;
         r) rules_string="$OPTARG||";;
         h|?) echo "Usage:    $0 -r <rule> <version> [<version>... ]"
     esac
@@ -473,6 +475,10 @@ for ver in $versions; do
 
         success=true
         allow_prerel=false
+        if $force_allow_prerel; then
+          allow_prerel=true
+        fi
+
         while read -r rule; do
             if [ -n "$(get_prerelease ${rule#* })" ] && semver_eq "$(get_number ${rule#* })" "$(get_number $ver)" || [ "$rule" = "all" ]; then
                 allow_prerel=true
