@@ -505,5 +505,5 @@ EOF
 done
 
 if [ -n "$output" ]; then
-    echo "$output"
+    printf '%b' "$output"
 fi
