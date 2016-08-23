@@ -11,6 +11,8 @@
 DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 
+SEMVER="$DIR/../node_modules/sh-semver/semver.sh"
+
 find_package_json_path() {
   local root="$1"
   while [ -n "$root" ]; do
@@ -37,8 +39,7 @@ version_from_package_json() {
       installed_versions+=( "$v" )
     done < <(nodenv versions --bare)
 
-    version=$("$DIR"/../deps/semver.sh \
-      -r "$version_expression" "${installed_versions[@]}" \
+    version=$("$SEMVER" -r "$version_expression" "${installed_versions[@]}" \
       | tail -n 1)
     if [[ -n "$version" ]] ; then
       echo "$version"
