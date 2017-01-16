@@ -6,10 +6,24 @@
 # test the installed versions against that range and print the
 # greatest matching version.
 
+
 # Setup for relative includes
 # http://stackoverflow.com/a/12694189/407845
-DIR="${BASH_SOURCE%/*}"
-if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+# while $SOURCE is a symlink, resolve it
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+	DIR="${SOURCE%/*}"
+	SOURCE="$( readlink "$SOURCE" )"
+	# If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve it relative to the symlink base directory
+	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+
+# Setup for relative includes
+# http://stackoverflow.com/a/12694189/407845
+DIR="${SOURCE%/*}"
+[ -d "$DIR" ] || DIR="$PWD"
+
 
 SEMVER="$DIR/../node_modules/sh-semver/semver.sh"
 
