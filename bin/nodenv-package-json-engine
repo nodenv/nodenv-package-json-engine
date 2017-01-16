@@ -8,22 +8,32 @@
 
 
 # Setup for relative includes
-# http://stackoverflow.com/a/12694189/407845
+# Adapted from
+# http://www.ostricher.com/2014/10/the-right-way-to-get-the-directory-of-a-bash-script/
+# and http://stackoverflow.com/a/12694189/407845
+get_script_dir() {
+  # while $SOURCE is a symlink, resolve it
+  local dir
+  local src="${BASH_SOURCE[0]}"
 
-# while $SOURCE is a symlink, resolve it
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do
-	DIR="${SOURCE%/*}"
-	SOURCE="$( readlink "$SOURCE" )"
-	# If $SOURCE was a relative symlink (so no "/" as prefix, need to resolve it relative to the symlink base directory
-	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-done
+  while [ -h "$src" ]; do
+    dir="${src%/*}"
+    src="$( readlink "$src" )"
+    
+    # If $SOURCE was a relative symlink (so no "/" as prefix),
+    # need to resolve it relative to the symlink base directory
+    [[ $src != /* ]] && src="$dir/$src"
+  done
+  dir="${src%/*}"
+  
+  if [ -d "$dir" ]; then
+    echo "$dir"
+  else
+    echo "$PWD"
+  fi
+}
 
-# Setup for relative includes
-# http://stackoverflow.com/a/12694189/407845
-DIR="${SOURCE%/*}"
-[ -d "$DIR" ] || DIR="$PWD"
-
+DIR="$(get_script_dir)"
 
 SEMVER="$DIR/../node_modules/sh-semver/semver.sh"
 
