@@ -5,7 +5,7 @@ that detects the node version based on the [engines](https://docs.npmjs.com/file
 
 When engines is configured with a range this plugin chooses the greatest installed version matching the range or exits with an error if none match.
 
-[![Travis](https://img.shields.io/travis/nodenv/nodenv-package-json-engine.svg?style=flat-square)](https://travis-ci.org/nodenv/nodenv-package-json-engine)
+[![Build Status](https://travis-ci.org/nodenv/nodenv-package-json-engine.svg?branch=master)](https://travis-ci.org/nodenv/nodenv-package-json-engine)
 
 ## Installation
 
