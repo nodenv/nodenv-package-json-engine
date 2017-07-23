@@ -44,7 +44,7 @@ find_package_json_path() {
 }
 
 should_find_in_package_json() {
-  [ -z "$(nodenv local 2>/dev/null)" ]
+  [[ -z "$(nodenv local 2>/dev/null)" ]] && ([[ -z ${NODENV_VERSION+x} ]] || [[ "${NODENV_VERSION}" == "$(nodenv global 2>/dev/null)" ]])
 }
 
 version_from_package_json() {
