@@ -12,6 +12,7 @@ setup() {
 teardown() {
   rm -r "$EXAMPLE_PACKAGE_DIR"
   rm -r "$NODENV_ROOT"
+  unset NODENV_VERSION
 }
 
 assert() {

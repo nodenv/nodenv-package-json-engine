@@ -39,3 +39,20 @@ load test_helper
   run nodenv package-json-engine
   assert_success ''
 }
+
+@test 'Prefers `nodenv shell` over package.json' {
+  create_version 5.0.0
+  cd_into_package 4.2.1
+  eval "$(nodenv sh-shell 5.0.0)"
+  run nodenv package-json-engine
+  assert_success ''
+}
+
+@test 'Prefers package.json over `nodenv global`' {
+  create_version 4.2.1
+  create_version 5.0.0
+  cd_into_package 4.2.1
+  nodenv global 5.0.0
+  run nodenv package-json-engine
+  assert_success '4.2.1'
+}
