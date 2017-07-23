@@ -33,7 +33,7 @@ Once you've installed the plugin you can verify that it's working by `cd`ing int
 
 ## Contributing
 
-To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/nodenv/nodenv), then run `bats test`  in the base directory of this plugin
+To run tests, clone this repository and install dependencies using `npm`. Start a shell **in which `nodenv init -` has not been executed**, then run `npm test` in the base directory of this plugin.
 
 ## Credits
 
