@@ -1,7 +1,7 @@
 # nodenv-package-json-engine
 
 This is a plugin for [nodenv](https://github.com/nodenv/nodenv)
-that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. `.node-version` files still take precedence.
+that detects the node version based on the [engines](https://docs.npmjs.com/files/package.json#engines) field of the current tree's package.json. The `$NODENV_VERSION` environment variable (set with `nodenv shell`) and `.node-version` files still take precedence.
 
 When engines is configured with a range this plugin chooses the greatest installed version matching the range or exits with an error if none match.
 
