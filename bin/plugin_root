@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # Writes the full path to the root of this plugin to standard out.
 # Use to source or run files in libexec/
