@@ -32,26 +32,13 @@ get_script_dir() {
   fi
 }
 
-find_package_json_path() {
-  local root="$1"
-  while [ -n "$root" ]; do
-    if [ -e "${root}/package.json" ]; then
-      echo "${root}/package.json"
-      exit
-    fi
-    root="${root%/*}"
-  done
-}
-
+# Give local version precedence
 should_find_in_package_json() {
   [ -z "$(nodenv local 2>/dev/null)" ]
 }
 
-version_from_package_json() {
-  local version_regex='"node":[ \t]*"([^"]*)"'
-  [[ $(cat "$PACKAGE_JSON_PATH") =~ $version_regex ]]
-  local version_expression="${BASH_REMATCH[1]}"
-
+find_installed_verion_matching_expression() {
+  local version_expression="$1"
   local -a installed_versions
   if [[ -n "$version_expression" ]] ; then
     while IFS= read -r v; do
@@ -73,9 +60,9 @@ DIR="$(get_script_dir)"
 SEMVER="$DIR/../node_modules/sh-semver/semver.sh"
 
 if should_find_in_package_json; then
-  PACKAGE_JSON_PATH=$(find_package_json_path "$PWD")
+  PACKAGE_JSON_ENGINES_EXPRESSION=$(nodenv-package-json-extract-expression)
 
-  if [ -e "$PACKAGE_JSON_PATH" ]; then
-    version_from_package_json
+  if [[ -n "$PACKAGE_JSON_ENGINES_EXPRESSION" ]]; then
+    find_installed_verion_matching_expression "$PACKAGE_JSON_ENGINES_EXPRESSION"
   fi
 fi
