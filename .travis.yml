@@ -1,2 +1,13 @@
 language: node_js
 node_js: node
+# Lint and test in parallel
+script:
+  - npm run lint
+  - npm test
+# from https://github.com/koalaman/shellcheck#travis-ci-setup
+addons:
+  apt:
+    sources:
+    - debian-sid    # Grab ShellCheck from the Debian repo
+    packages:
+    - shellcheck
