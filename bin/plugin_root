@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#
+# Writes the full path to the root of this plugin to standard out.
+# Use to source or run files in libexec/
+#
+# Adapted from:
+# http://www.ostricher.com/2014/10/the-right-way-to-get-the-directory-of-a-bash-script/
+# http://stackoverflow.com/a/12694189/407845
+src="${BASH_SOURCE[0]}"
+
+# while $src is a symlink, resolve it
+while [ -h "$src" ]; do
+  dir="${src%/*}"
+  src="$( readlink "$src" )"
+
+  # If $src was a relative symlink (so no "/" as prefix),
+  # need to resolve it relative to the symlink base directory
+  [[ $src != /* ]] && src="$dir/$src"
+done
+dir="${src%/*}"
+
+if [ -d "$dir" ]; then
+  echo "$dir/.."
+else
+  echo "$PWD/.."
+fi

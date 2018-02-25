@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# If a custom Node version is not already defined, we look
+# for a Node version semver expressing in the current tree's package.json.
+# If we find a fixed version, we print it out.  If we find a range we
+# test the installed versions against that range and print the
+# greatest matching version.
+
+
+# Exits non-zero if this plugin should yield precedence
+# Gives precedence to local and shell versions.
+# Takes precedence over global version.
+package_json_has_precedence() {
+  if [[ -z "$(nodenv local 2>/dev/null)" ]]; then
+    exit;
+  else
+    exit 1;
+  fi
+}
+
+find_package_json_path() {
+  local root="$1"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/package.json" ]; then
+      echo "${root}/package.json"
+      exit
+    fi
+    root="${root%/*}"
+  done
+}
+
+extract_version_from_package_json() {
+  local package_json_path="$1"
+  local version_regex='"node":[ \t]*"([^"]*)"'
+  [[ $(cat "$package_json_path") =~ $version_regex ]]
+  echo "${BASH_REMATCH[1]}"
+}
+
+find_installed_verion_matching_expression() {
+  local version_expression="$1"
+  local -a installed_versions
+  while IFS= read -r v; do
+    installed_versions+=( "$v" )
+  done < <(nodenv versions --bare)
+
+  version=$("$SEMVER" -r "$version_expression" "${installed_versions[@]}" \
+    | tail -n 1)
+  echo "$version"
+}
+
+SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
+
+get_version_respecting_precedence() {
+  if ! $(package_json_has_precedence); then
+    exit
+  fi
+
+  local package_json_path=$(find_package_json_path "$PWD")
+  if [ ! -e "$package_json_path" ]; then exit; fi
+
+  local version_expression=$(
+    extract_version_from_package_json "$package_json_path"
+  )
+  if [ -z "$version_expression" ]; then exit; fi
+
+  local version=$(
+    find_installed_verion_matching_expression "$version_expression"
+  )
+  if [ -z "$version" ]; then exit 1; fi
+  echo "$version"
+}
+
+get_expression_respecting_precedence() {
+  if ! $(package_json_has_precedence); then exit; fi
+
+  local package_json_path=$(find_package_json_path "$PWD")
+  if [ ! -e "$package_json_path" ]; then exit; fi
+
+  local version_expression=$(
+    extract_version_from_package_json "$package_json_path"
+  )
+  echo "$version_expression"
+}
