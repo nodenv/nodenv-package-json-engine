@@ -5,6 +5,7 @@ PLUGIN_ROOT="${BATS_TEST_DIRNAME%${TEST_BASENAME}}"
 
 setup() {
   export NODENV_ROOT="$BATS_TMPDIR/nodenv_root"
+  unset NODENV_VERSION # don't leak version from test runner
   mkdir -p "$NODENV_ROOT/plugins"
   ln -s "$PLUGIN_ROOT" "$NODENV_ROOT/plugins/package-json-engine"
 }
