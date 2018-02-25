@@ -11,7 +11,8 @@
 # Gives precedence to local and shell versions.
 # Takes precedence over global version.
 package_json_has_precedence() {
-  if [[ -z "$(nodenv local 2>/dev/null)" ]]; then
+  if [[ ( -z "$(nodenv local 2>/dev/null)" )
+  && ( -z "$(nodenv sh-shell 2>/dev/null)" ) ]]; then
     exit;
   else
     exit 1;
