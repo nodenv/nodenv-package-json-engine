@@ -37,7 +37,7 @@ extract_version_from_package_json() {
   echo "${BASH_REMATCH[1]}"
 }
 
-find_installed_verion_matching_expression() {
+find_installed_version_matching_expression() {
   version_expression="$1"
   local -a installed_versions
   while IFS= read -r v; do
@@ -63,7 +63,7 @@ get_version_respecting_precedence() {
   if [ -z "$version_expression" ]; then return; fi
 
   version=$(
-    find_installed_verion_matching_expression "$version_expression"
+    find_installed_version_matching_expression "$version_expression"
   )
   if [ -z "$version" ]; then return 1; fi
   echo "$version"
