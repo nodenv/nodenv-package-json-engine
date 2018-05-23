@@ -58,6 +58,21 @@ cd_into_package() {
   echo "$packageJson" > "$EXAMPLE_PACKAGE_DIR/package.json"
 }
 
+cd_into_babel_env_package() {
+  local packageJson="{
+    \"presets\": [
+      [\"env\", {
+        \"targets\": {
+          \"node\": \"current\"
+        }
+      }]
+    ]
+  }"
+  mkdir -p "$EXAMPLE_PACKAGE_DIR"
+  cd "$EXAMPLE_PACKAGE_DIR"
+  echo "$packageJson" > "$EXAMPLE_PACKAGE_DIR/package.json"
+}
+
 # Creates fake version directory
 create_version() {
   d="$NODENV_ROOT/versions/$1/bin"
