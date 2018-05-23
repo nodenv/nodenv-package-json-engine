@@ -4,10 +4,3 @@ node_js: node
 script:
   - npm run lint
   - npm test
-# from https://github.com/koalaman/shellcheck#travis-ci-setup
-addons:
-  apt:
-    sources:
-    - debian-sid    # Grab ShellCheck from the Debian repo
-    packages:
-    - shellcheck

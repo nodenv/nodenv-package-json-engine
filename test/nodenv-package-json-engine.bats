@@ -85,3 +85,9 @@ load test_helper
   run nodenv version-name
   assert_success '5.0.0'
 }
+
+@test 'Does not match babel preset env settings' {
+  cd_into_babel_env_package
+  run nodenv version-name
+  assert_success 'system'
+}

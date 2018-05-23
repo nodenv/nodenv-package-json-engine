@@ -6,6 +6,9 @@
 # test the installed versions against that range and print the
 # greatest matching version.
 
+# Vendored scripts:
+JSON_SH="$(plugin_root)/node_modules/JSON.sh/JSON.sh"
+SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
 
 # Exits non-zero if this plugin should yield precedence
 # Gives precedence to local and shell versions.
@@ -32,12 +35,12 @@ find_package_json_path() {
 
 extract_version_from_package_json() {
   package_json_path="$1"
-  version_regex='"node":[ \t]*"([^"]*)"'
-  [[ $(cat "$package_json_path") =~ $version_regex ]]
+  version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
+  [[ $("$JSON_SH" -b -n < "$package_json_path") =~ $version_regex ]]
   echo "${BASH_REMATCH[1]}"
 }
 
-find_installed_verion_matching_expression() {
+find_installed_version_matching_expression() {
   version_expression="$1"
   local -a installed_versions
   while IFS= read -r v; do
@@ -48,8 +51,6 @@ find_installed_verion_matching_expression() {
     | tail -n 1)
   echo "$version"
 }
-
-SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
 
 get_version_respecting_precedence() {
   if ! package_json_has_precedence; then return; fi
@@ -63,7 +64,7 @@ get_version_respecting_precedence() {
   if [ -z "$version_expression" ]; then return; fi
 
   version=$(
-    find_installed_verion_matching_expression "$version_expression"
+    find_installed_version_matching_expression "$version_expression"
   )
   if [ -z "$version" ]; then return 1; fi
   echo "$version"

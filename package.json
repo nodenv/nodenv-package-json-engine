@@ -33,6 +33,7 @@
     "brew-publish": "^2.0.0"
   },
   "dependencies": {
-    "sh-semver": "^1.0.0"
+    "sh-semver": "^1.0.0",
+    "JSON.sh": "~0.3.3"
   }
 }
