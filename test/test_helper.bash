@@ -1,5 +1,5 @@
 EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
-TEST_BASENAME="$(basename $BATS_TEST_DIRNAME)"
+TEST_BASENAME="$(basename "$BATS_TEST_DIRNAME")"
 # TODO: Should this just be $(dirname ...) ?
 PLUGIN_ROOT="${BATS_TEST_DIRNAME%${TEST_BASENAME}}"
 
@@ -17,7 +17,7 @@ teardown() {
 
 assert() {
   if ! "$@"; then
-    flunk "failed: $@"
+    flunk "failed: $*"
   fi
 }
 
@@ -34,10 +34,12 @@ assert_output() {
   if [ $# -eq 0 ]; then expected="$(cat -)"
   else expected="$1"
   fi
+  # shellcheck disable=SC2154
   assert_equal "$expected" "$output"
 }
 
 assert_success() {
+  # shellcheck disable=SC2154
   if [ "$status" -ne 0 ]; then
     flunk "command failed with exit status $status"
   elif [ "$#" -gt 0 ]; then
@@ -54,23 +56,24 @@ cd_into_package() {
     }
   }"
   mkdir -p "$EXAMPLE_PACKAGE_DIR"
-  cd "$EXAMPLE_PACKAGE_DIR"
+  cd "$EXAMPLE_PACKAGE_DIR" || return 1
   echo "$packageJson" > "$EXAMPLE_PACKAGE_DIR/package.json"
 }
 
 cd_into_babel_env_package() {
-  local packageJson="{
-    \"presets\": [
-      [\"env\", {
-        \"targets\": {
-          \"node\": \"current\"
-        }
-      }]
-    ]
-  }"
   mkdir -p "$EXAMPLE_PACKAGE_DIR"
-  cd "$EXAMPLE_PACKAGE_DIR"
-  echo "$packageJson" > "$EXAMPLE_PACKAGE_DIR/package.json"
+  cd "$EXAMPLE_PACKAGE_DIR" || return 1
+  cat << JSON > package.json
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
+}
+JSON
 }
 
 # Creates fake version directory
