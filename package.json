@@ -1,6 +1,6 @@
 {
   "name": "nodenv-package-json-engine",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "description": "Activate a nodenv node version from package.json engines",
   "homepage": "https://github.com/nodenv/nodenv-package-json-engine#readme",
