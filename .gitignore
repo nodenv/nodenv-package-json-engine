@@ -1,4 +1,3 @@
 node_modules/
 test/nodenv/
 yarn-error.log
-package-lock.json
