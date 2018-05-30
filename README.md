@@ -42,3 +42,5 @@ To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](h
 Nodenv plugin hooks integration and tests heavily inspired by [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
 
 Shell semver range support provided by [sh-semver](https://github.com/qzb/sh-semver).
+
+`package.json` parsing provided by [JSON.sh](https://github.com/dominictarr/JSON.sh).
