@@ -49,15 +49,16 @@ assert_success() {
 
 # cd_into_package nodeVersion [extraArgs]
 cd_into_package() {
-  local version="$1"
-  local packageJson="{
-    \"engines\": {
-      \"node\": \"${version}\"
-    }
-  }"
   mkdir -p "$EXAMPLE_PACKAGE_DIR"
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
-  echo "$packageJson" > "$EXAMPLE_PACKAGE_DIR/package.json"
+  local version="$1"
+  cat << JSON > package.json
+{
+  "engines": {
+    "node": "$version"
+  }
+}
+JSON
 }
 
 cd_into_babel_env_package() {
