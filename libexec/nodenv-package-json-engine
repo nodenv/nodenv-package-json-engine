@@ -46,7 +46,7 @@ find_installed_version_matching_expression() {
   local -a installed_versions
   while IFS= read -r v; do
     installed_versions+=( "$v" )
-  done < <(nodenv versions --bare)
+  done < <(nodenv versions --bare --skip-aliases)
 
   version=$("$SEMVER" -r "$version_expression" "${installed_versions[@]}" \
     | tail -n 1)
