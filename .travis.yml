@@ -1,6 +1,2 @@
 language: node_js
 node_js: node
-# Lint and test in parallel
-script:
-  - npm run lint
-  - npm test
