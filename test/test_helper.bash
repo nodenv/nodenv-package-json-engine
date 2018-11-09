@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
 TEST_BASENAME="$(basename "$BATS_TEST_DIRNAME")"
 # TODO: Should this just be $(dirname ...) ?
