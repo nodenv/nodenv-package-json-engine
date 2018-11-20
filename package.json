@@ -20,6 +20,11 @@
     "testnodenv": "test/nodenv",
     "test": "test"
   },
+  "files": [
+    "bin",
+    "etc",
+    "libexec"
+  ],
   "scripts": {
     "lint": "git ls-files bin etc libexec test/*.bash | xargs shellcheck",
     "pretest": "[ -d $npm_package_directories_testnodenv ] || git clone --quiet --depth 1 https://github.com/nodenv/nodenv $npm_package_directories_testnodenv",
