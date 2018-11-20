@@ -45,7 +45,7 @@ load test_helper
   assert [ "$status" -eq 1 ]
 }
 
-@test 'Prefers `nodenv local` over package.json' {
+@test 'Prefers nodenv-local over package.json' {
   create_version 4.2.1
   create_version 5.0.0
   cd_into_package 4.2.1
@@ -55,7 +55,7 @@ load test_helper
   assert_success "5.0.0 (set by $PWD/.node-version)"
 }
 
-@test 'Prefers `nodenv shell` over package.json' {
+@test 'Prefers nodenv-shell over package.json' {
   create_version 5.0.0
   cd_into_package 4.2.1
   eval "$(nodenv sh-shell 5.0.0)"
@@ -64,7 +64,7 @@ load test_helper
   assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
-@test 'Prefers package.json over `nodenv global`' {
+@test 'Prefers package.json over nodenv-global' {
   create_version 4.2.1
   create_version 5.0.0
   cd_into_package 4.2.1
@@ -74,7 +74,7 @@ load test_helper
   assert_success '4.2.1'
 }
 
-@test 'Is not confused by `nodenv shell` shadowing `nodenv global`' {
+@test 'Is not confused by nodenv-shell shadowing nodenv-global' {
   create_version 4.2.1
   create_version 5.0.0
   cd_into_package 4.2.1
