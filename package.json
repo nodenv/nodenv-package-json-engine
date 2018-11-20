@@ -25,8 +25,10 @@
     "pretest": "[ -d $npm_package_directories_testnodenv ] || git clone --quiet --depth 1 https://github.com/nodenv/nodenv $npm_package_directories_testnodenv",
     "test": "PATH=$PWD/$npm_package_directories_testnodenv/bin:$PATH bats ${CI:+--tap} test",
     "posttest": "npm run lint",
-    "publish:brew": "brew-publish $npm_package_name v$npm_package_version",
-    "postversion": "git push --follow-tags && npm run publish:brew"
+    "postversion": "npm publish",
+    "prepublishOnly": "npm run publish:github && npm run publish:brew",
+    "publish:brew": "brew-publish",
+    "publish:github": "git push --follow-tags"
   },
   "devDependencies": {
     "bats": "^0.4.2",
