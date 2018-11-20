@@ -1,5 +1,4 @@
 #!/usr/bin/env bats
-# Tests of basic usage and functionality
 
 load test_helper
 
