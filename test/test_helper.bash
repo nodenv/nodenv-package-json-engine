@@ -1,15 +1,17 @@
 # shellcheck shell=bash
 
+unset NODENV_VERSION
+
 EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
-TEST_BASENAME="$(basename "$BATS_TEST_DIRNAME")"
-# TODO: Should this just be $(dirname ...) ?
-PLUGIN_ROOT="${BATS_TEST_DIRNAME%${TEST_BASENAME}}"
 
 setup() {
   export NODENV_ROOT="$BATS_TMPDIR/nodenv_root"
-  unset NODENV_VERSION # don't leak version from test runner
-  mkdir -p "$NODENV_ROOT/plugins"
-  ln -s "$PLUGIN_ROOT" "$NODENV_ROOT/plugins/package-json-engine"
+
+  PATH="$(npm bin):/usr/bin:/bin:/usr/sbin:/sbin"
+  PATH="${BATS_TEST_DIRNAME}/../bin:$PATH"
+  export PATH
+
+  eval "$(nodenv init -)"
 }
 
 teardown() {
