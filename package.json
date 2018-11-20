@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@nodenv/nodenv": "^1.1.2",
-    "bats": "^0.4.2",
+    "bats": "^1.1.0",
     "bats-assert": "^1.1.1",
     "brew-publish": "^2.3.1"
   },
