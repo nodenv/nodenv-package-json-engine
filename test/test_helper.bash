@@ -17,9 +17,8 @@ setup() {
 }
 
 teardown() {
-  rm "$EXAMPLE_PACKAGE_DIR"/.node-version
-  rm "$EXAMPLE_PACKAGE_DIR"/package.json
-  rm "$NODENV_ROOT"/versions/*
+  rm -f "$EXAMPLE_PACKAGE_DIR"/.node-version
+  rm -f "$EXAMPLE_PACKAGE_DIR"/package.json
   rm -f "$NODENV_ROOT/version"
 }
 
@@ -47,10 +46,4 @@ cd_into_babel_env_package() {
   ]
 }
 JSON
-}
-
-with_installed_node_versions() {
-  for v in "$@"; do
-    ln -fhs "$BATS_TEST_DIRNAME/fixtures/node-x.y.z/" "$NODENV_ROOT/versions/$v"
-  done
 }
