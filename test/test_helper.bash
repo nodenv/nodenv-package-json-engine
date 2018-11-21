@@ -2,9 +2,6 @@
 
 load ../node_modules/bats-assert/all
 
-EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
-mkdir -p "$EXAMPLE_PACKAGE_DIR"
-
 setup() {
   # common nodenv setup
   unset NODENV_VERSION
@@ -15,7 +12,9 @@ setup() {
 
   export NODENV_ROOT="$BATS_TEST_DIRNAME/fixtures/nodenv_root"
 
-
+  # custom setup
+  EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
+  mkdir -p "$EXAMPLE_PACKAGE_DIR"
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
 }
 
