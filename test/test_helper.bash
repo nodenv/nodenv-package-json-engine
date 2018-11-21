@@ -14,16 +14,23 @@ setup() {
   export PATH="$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   export NODENV_ROOT="$BATS_TEST_DIRNAME/fixtures/nodenv_root"
+
+
+  cd "$EXAMPLE_PACKAGE_DIR" || return 1
 }
 
 teardown() {
   rm -f "$EXAMPLE_PACKAGE_DIR"/.node-version
-  rm -f "$EXAMPLE_PACKAGE_DIR"/package.json
+  rm -rf "$EXAMPLE_PACKAGE_DIR"/package.json
   rm -f "$NODENV_ROOT/version"
 }
 
-in_package_for_engine() {
+in_example_package() {
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
+}
+
+in_package_for_engine() {
+  in_example_package
   cat << JSON > package.json
 {
   "engines": {
@@ -33,8 +40,8 @@ in_package_for_engine() {
 JSON
 }
 
-cd_into_babel_env_package() {
-  cd "$EXAMPLE_PACKAGE_DIR" || return 1
+in_package_with_babel_env() {
+  in_example_package
   cat << JSON > package.json
 {
   "presets": [

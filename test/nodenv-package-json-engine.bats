@@ -56,8 +56,35 @@ load test_helper
   assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
-@test 'Does not match babel preset env settings' {
-  cd_into_babel_env_package
+@test 'Does not match arbitrary "node" key in package.json' {
+  in_package_with_babel_env
+
+  run nodenv version-name
+
+  assert_success 'system'
+}
+
+@test 'Handles missing package.json' {
+  in_example_package
+
+  run nodenv version-name
+
+  assert_success 'system'
+}
+
+@test 'Does not fail with unreadable package.json' {
+  in_example_package
+  touch package.json
+  chmod -r package.json
+
+  run nodenv version-name
+
+  assert_success 'system'
+}
+
+@test 'Does not fail with non-file package.json' {
+  in_example_package
+  mkdir package.json
 
   run nodenv version-name
 
