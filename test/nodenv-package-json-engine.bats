@@ -41,9 +41,8 @@ load test_helper
 
 @test 'Prefers nodenv-shell over package.json' {
   in_package_for_engine 4.2.1
-  eval "$(nodenv sh-shell 5.0.0)"
 
-  run nodenv version
+  NODENV_VERSION=5.0.0 run nodenv version
   assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
@@ -58,14 +57,15 @@ load test_helper
 @test 'Is not confused by nodenv-shell shadowing nodenv-global' {
   in_package_for_engine 4.2.1
   nodenv global 5.0.0
-  eval "$(nodenv sh-shell 5.0.0)"
 
-  run nodenv version-name
-  assert_success '5.0.0'
+  NODENV_VERSION=5.0.0 run nodenv version
+  assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
 @test 'Does not match babel preset env settings' {
   cd_into_babel_env_package
+
   run nodenv version-name
+
   assert_success 'system'
 }
