@@ -90,3 +90,22 @@ load test_helper
 
   assert_success 'system'
 }
+
+@test 'Does not fail with empty or malformed package.json' {
+  in_example_package
+
+  # empty
+  touch package.json
+  run nodenv version-name
+  assert_success 'system'
+
+  # non json
+  echo "foo" > package.json
+  run nodenv version-name
+  assert_success 'system'
+
+  # malformed
+  echo "{" > package.json
+  run nodenv version-name
+  assert_success 'system'
+}

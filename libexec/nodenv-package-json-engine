@@ -39,7 +39,7 @@ extract_version_from_package_json() {
   package_json_path="$1"
   version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
   # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
-  [[ $("$JSON_SH" -b -n < "$package_json_path") =~ $version_regex ]]
+  [[ $("$JSON_SH" -b -n < "$package_json_path" 2>/dev/null) =~ $version_regex ]]
   echo "${BASH_REMATCH[1]}"
 }
 
