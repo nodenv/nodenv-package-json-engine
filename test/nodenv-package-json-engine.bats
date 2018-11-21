@@ -22,13 +22,11 @@ load test_helper
   # For unknown reasons, nodenv-version succeeds when version-name fails,
   # so we're testing version-name directly
   run nodenv version-name
-  assert [ "$output" = "package-json-engine: no version satisfying \`^1.0.0' installed" ]
-  assert [ "$status" -eq 1 ]
+  assert_failure "package-json-engine: no version satisfying \`^1.0.0' installed"
 
   # `which` should fail similarly
   run nodenv which node
-  assert echo "$output" | grep 'no version satisfying'
-  assert [ "$status" -eq 1 ]
+  assert_failure "package-json-engine: no version satisfying \`^1.0.0' installed"
 }
 
 @test 'Prefers nodenv-local over package.json' {
