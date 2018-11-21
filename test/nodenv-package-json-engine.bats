@@ -19,14 +19,10 @@ load test_helper
 @test 'Ignores non-matching installed versions' {
   in_package_for_engine '^1.0.0'
 
-  # For unknown reasons, nodenv-version succeeds when version-name fails,
-  # so we're testing version-name directly
-  run nodenv version-name
-  assert_failure "package-json-engine: no version satisfying \`^1.0.0' installed"
-
-  # `which` should fail similarly
-  run nodenv which node
-  assert_failure "package-json-engine: no version satisfying \`^1.0.0' installed"
+  run nodenv version
+  # note the command completes successfully
+  assert_success "package-json-engine: no version satisfying \`^1.0.0' installed
+ (set by package-json-engine matching ^1.0.0)"
 }
 
 @test 'Prefers nodenv-local over package.json' {
