@@ -1,3 +1,2 @@
-node_modules/
-test/nodenv/
-yarn-error.log
+/node_modules
+/nodenv-nodenv-package-json-engine-*.tgz
