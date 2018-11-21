@@ -109,3 +109,24 @@ load test_helper
   run nodenv version-name
   assert_success 'system'
 }
+
+@test 'Handles multiple occurrences of "node" key' {
+  in_example_package
+  cat << JSON > package.json
+{
+  "engines": {
+    "node": "4.2.1"
+  },
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
+}
+JSON
+
+  run nodenv version-name
+  assert_success '4.2.1'
+}
