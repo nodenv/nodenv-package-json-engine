@@ -7,40 +7,40 @@ setup() {
   unset NODENV_VERSION
 
   local node_modules_bin=$BATS_TEST_DIRNAME/../node_modules/.bin
-  local plugin_bin=$BATS_TEST_DIRNAME/../bin
 
-  export PATH="$plugin_bin:$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  export PATH="$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
-  export NODENV_ROOT="$BATS_TMPDIR/nodenv_root"
-  export NODENV_HOOK_PATH="$BATS_TEST_DIRNAME/../etc/nodenv.d"
+  export NODENV_ROOT="$BATS_TEST_DIRNAME/fixtures/nodenv_root"
 
-  # unique
-
+  # custom setup
   EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
+  mkdir -p "$EXAMPLE_PACKAGE_DIR"
+  cd "$EXAMPLE_PACKAGE_DIR" || return 1
 }
 
 teardown() {
-  rm -r "$EXAMPLE_PACKAGE_DIR"
-  rm -r "$NODENV_ROOT"
+  rm -f "$EXAMPLE_PACKAGE_DIR"/.node-version
+  rm -rf "$EXAMPLE_PACKAGE_DIR"/package.json
+  rm -f "$NODENV_ROOT/version"
 }
 
-# cd_into_package nodeVersion [extraArgs]
-cd_into_package() {
-  mkdir -p "$EXAMPLE_PACKAGE_DIR"
+in_example_package() {
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
-  local version="$1"
+}
+
+in_package_for_engine() {
+  in_example_package
   cat << JSON > package.json
 {
   "engines": {
-    "node": "$version"
+    "node": "$1"
   }
 }
 JSON
 }
 
-cd_into_babel_env_package() {
-  mkdir -p "$EXAMPLE_PACKAGE_DIR"
-  cd "$EXAMPLE_PACKAGE_DIR" || return 1
+in_package_with_babel_env() {
+  in_example_package
   cat << JSON > package.json
 {
   "presets": [
@@ -52,11 +52,4 @@ cd_into_babel_env_package() {
   ]
 }
 JSON
-}
-
-# Creates fake version directory
-create_version() {
-  d="$NODENV_ROOT/versions/$1/bin"
-  mkdir -p "$d"
-  ln -s /bin/echo "$d/node"
 }

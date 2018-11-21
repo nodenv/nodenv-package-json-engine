@@ -23,10 +23,12 @@ package_json_has_precedence() {
 }
 
 find_package_json_path() {
-  root="$1"
+  local package_json root="$1"
   while [ -n "$root" ]; do
-    if [ -e "${root}/package.json" ]; then
-      echo "${root}/package.json"
+    package_json="$root/package.json"
+
+    if [ -r "$package_json" ] && [ -f "$package_json" ]; then
+      echo "$package_json"
       return
     fi
     root="${root%/*}"
@@ -37,7 +39,7 @@ extract_version_from_package_json() {
   package_json_path="$1"
   version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
   # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
-  [[ $("$JSON_SH" -b -n < "$package_json_path") =~ $version_regex ]]
+  [[ $("$JSON_SH" -b -n < "$package_json_path" 2>/dev/null) =~ $version_regex ]]
   echo "${BASH_REMATCH[1]}"
 }
 
