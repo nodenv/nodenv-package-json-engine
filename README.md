@@ -33,13 +33,11 @@ Once you've installed the plugin you can verify that it's working by `cd`ing int
 
 ## Contributing
 
-To run tests, install [bats](https://github.com/sstephenson/bats) and [nodenv](https://github.com/nodenv/nodenv), then run `bats test`  in the base directory of this plugin
+`npm install` and `npm test` from within the project.
 
 ## Credits
 
-`package.json` inspection and SemVer integration heavily inspired by nvmish [[1]](https://github.com/goodeggs/homebrew-delivery-eng/blob/master/nvmish.sh) [[2]](https://gist.github.com/assaf/ee377a186371e2e269a7).
-
-Nodenv plugin hooks integration and tests heavily inspired by [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
+`package.json` inspection and SemVer integration heavily inspired by nvmish [[1]](https://github.com/goodeggs/homebrew-delivery-eng/blob/master/nvmish.sh) [[2]](https://gist.github.com/assaf/ee377a186371e2e269a7) and [rbenv-bundler-ruby-version](https://github.com/aripollak/rbenv-bundler-ruby-version).
 
 Shell semver range support provided by [sh-semver](https://github.com/qzb/sh-semver).
 
