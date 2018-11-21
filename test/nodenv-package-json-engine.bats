@@ -86,6 +86,7 @@ load test_helper
 }
 
 @test 'Does not match babel preset env settings' {
+  create_version 4.2.1
   cd_into_babel_env_package
   run nodenv version-name
   assert_success 'system'

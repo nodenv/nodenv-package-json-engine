@@ -3,17 +3,20 @@
 load ../node_modules/bats-assert/all
 
 setup() {
+  # common nodenv setup
   unset NODENV_VERSION
 
-  EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
+  local node_modules_bin=$BATS_TEST_DIRNAME/../node_modules/.bin
+  local plugin_bin=$BATS_TEST_DIRNAME/../bin
+
+  export PATH="$plugin_bin:$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   export NODENV_ROOT="$BATS_TMPDIR/nodenv_root"
+  export NODENV_HOOK_PATH="$BATS_TEST_DIRNAME/../etc/nodenv.d"
 
-  PATH="$(npm bin):/usr/bin:/bin:/usr/sbin:/sbin"
-  PATH="${BATS_TEST_DIRNAME}/../bin:$PATH"
-  export PATH
+  # unique
 
-  eval "$(nodenv init -)"
+  EXAMPLE_PACKAGE_DIR="$BATS_TMPDIR/example_package"
 }
 
 teardown() {
