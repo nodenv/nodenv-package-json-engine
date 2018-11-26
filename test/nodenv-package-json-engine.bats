@@ -6,14 +6,16 @@ load test_helper
   in_package_for_engine 4.2.1
 
   run nodenv version
-  assert_success '4.2.1 (set by package-json-engine matching 4.2.1)'
+  assert_success
+  assert_output '4.2.1 (set by package-json-engine matching 4.2.1)'
 }
 
 @test 'Prefers the greatest installed version matching a range' {
   in_package_for_engine '^4.0.0'
 
   run nodenv version
-  assert_success '4.2.1 (set by package-json-engine matching ^4.0.0)'
+  assert_success
+  assert_output '4.2.1 (set by package-json-engine matching ^4.0.0)'
 }
 
 @test 'Ignores non-matching installed versions' {
@@ -21,8 +23,11 @@ load test_helper
 
   run nodenv version
   # note the command completes successfully
-  assert_success "package-json-engine: version satisfying \`^1.0.0' not installed
- (set by package-json-engine matching ^1.0.0)"
+  assert_success
+  assert_output <<-MSG
+package-json-engine: version satisfying \`^1.0.0' not installed
+ (set by package-json-engine matching ^1.0.0)
+MSG
 }
 
 @test 'Prefers nodenv-local over package.json' {
@@ -30,14 +35,16 @@ load test_helper
   nodenv local 5.0.0
 
   run nodenv version
-  assert_success "5.0.0 (set by $PWD/.node-version)"
+  assert_success
+  assert_output "5.0.0 (set by $PWD/.node-version)"
 }
 
 @test 'Prefers nodenv-shell over package.json' {
   in_package_for_engine 4.2.1
 
   NODENV_VERSION=5.0.0 run nodenv version
-  assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
+  assert_success
+  assert_output "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
 @test 'Prefers package.json over nodenv-global' {
@@ -45,7 +52,8 @@ load test_helper
   nodenv global 5.0.0
 
   run nodenv version-name
-  assert_success '4.2.1'
+  assert_success
+  assert_output '4.2.1'
 }
 
 @test 'Is not confused by nodenv-shell shadowing nodenv-global' {
@@ -53,7 +61,8 @@ load test_helper
   nodenv global 5.0.0
 
   NODENV_VERSION=5.0.0 run nodenv version
-  assert_success "5.0.0 (set by NODENV_VERSION environment variable)"
+  assert_success
+  assert_output "5.0.0 (set by NODENV_VERSION environment variable)"
 }
 
 @test 'Does not match arbitrary "node" key in package.json' {
@@ -61,7 +70,8 @@ load test_helper
 
   run nodenv version-name
 
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 }
 
 @test 'Handles missing package.json' {
@@ -69,7 +79,8 @@ load test_helper
 
   run nodenv version-name
 
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 }
 
 @test 'Does not fail with unreadable package.json' {
@@ -79,7 +90,8 @@ load test_helper
 
   run nodenv version-name
 
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 }
 
 @test 'Does not fail with non-file package.json' {
@@ -88,7 +100,8 @@ load test_helper
 
   run nodenv version-name
 
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 }
 
 @test 'Does not fail with empty or malformed package.json' {
@@ -97,17 +110,20 @@ load test_helper
   # empty
   touch package.json
   run nodenv version-name
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 
   # non json
   echo "foo" > package.json
   run nodenv version-name
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 
   # malformed
   echo "{" > package.json
   run nodenv version-name
-  assert_success 'system'
+  assert_success
+  assert_output 'system'
 }
 
 @test 'Handles multiple occurrences of "node" key' {
@@ -128,5 +144,6 @@ load test_helper
 JSON
 
   run nodenv version-name
-  assert_success '4.2.1'
+  assert_success
+  assert_output '4.2.1'
 }
