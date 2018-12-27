@@ -1,6 +1,6 @@
 {
   "name": "@nodenv/nodenv-package-json-engine",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Activate a nodenv node version from package.json engines",
   "homepage": "https://github.com/nodenv/nodenv-package-json-engine#readme",
   "license": "MIT",
