@@ -7,6 +7,17 @@ When `engines` is configured with a range this plugin chooses the greatest insta
 
 [![Build Status](https://travis-ci.org/nodenv/nodenv-package-json-engine.svg?branch=master)](https://travis-ci.org/nodenv/nodenv-package-json-engine)
 
+<!-- toc -->
+
+- [Installation](#installation)
+  * [Installing with Git](#installing-with-git)
+  * [Installing with Homebrew](#installing-with-homebrew)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Credits](#credits)
+
+<!-- tocstop -->
+
 ## Installation
 
 ### Installing with Git
