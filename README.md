@@ -9,6 +9,15 @@ When `engines` is configured with a range this plugin chooses the greatest insta
 
 <!-- toc -->
 
+- [Installation](#installation)
+  * [Installing with Git](#installing-with-git)
+  * [Installing with Homebrew](#installing-with-homebrew)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Credits](#credits)
+
+<!-- tocstop -->
+
 ## Installation
 
 ### Installing with Git
