@@ -50,9 +50,20 @@ find_installed_version_matching_expression() {
     installed_versions+=( "$v" )
   done < <(nodenv versions --bare --skip-aliases | grep -e '^[[:digit:]]')
 
-  version=$("$SEMVER" -r "$version_expression" "${installed_versions[@]}" \
-    | tail -n 1)
-  echo "$version"
+  local fast_guess
+  fast_guess=$("$SEMVER" -r "$version_expression" "${installed_versions[@]:${#installed_versions[@]}-1}" | tail -n 1)
+
+  # Most #engine version specs just specify a baseline version,
+  # which means most likely, the highest installed version will satisfy
+  # This does a first pass with just that single version in hopes it satisfies.
+  # If so, we can avoid the cost of sh-semver sorting and validating across
+  # all the installed versions.
+  if [ -n "$fast_guess" ]; then
+    echo "$fast_guess"
+    return
+  fi
+
+  "$SEMVER" -r "$version_expression" "${installed_versions[@]}" | tail -n 1
 }
 
 get_version_respecting_precedence() {
