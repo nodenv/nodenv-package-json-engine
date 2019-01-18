@@ -41,7 +41,7 @@
     "brew-publish": "^2.3.1"
   },
   "dependencies": {
-    "sh-semver": "^1.0.0",
+    "sh-semver": "qzb/sh-semver",
     "JSON.sh": "~0.3.3"
   }
 }
