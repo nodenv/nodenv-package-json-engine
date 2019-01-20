@@ -27,6 +27,7 @@ teardown() {
 
 in_example_package() {
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
+  echo '{}' > package.json
 }
 
 in_package_for_engine() {

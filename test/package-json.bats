@@ -35,46 +35,6 @@ load test_helper
   assert_output 'package-json-engine: no engine version configured for this package'
 }
 
-@test 'Handles missing package.json' {
-  in_example_package
-
-  run nodenv package-json
-
-  assert_failure
-  assert_output 'package-json-engine: no package.json found for this directory'
-}
-
-@test 'Handles unreadable package.json' {
-  in_example_package
-  touch package.json
-  chmod -r package.json
-
-  run nodenv package-json
-
-  assert_failure
-  assert_output 'package-json-engine: no package.json found for this directory'
-}
-
-@test 'Handles non-file package.json' {
-  in_example_package
-  mkdir package.json
-
-  run nodenv package-json
-
-  assert_failure
-  assert_output 'package-json-engine: no package.json found for this directory'
-}
-
-@test 'Handles empty package.json' {
-  in_example_package
-
-  # empty
-  touch package.json
-  run nodenv package-json
-  assert_failure
-  assert_output 'package-json-engine: no package.json found for this directory'
-}
-
 @test 'Handles malformed package.json' {
   in_example_package
 

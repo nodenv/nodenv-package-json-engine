@@ -16,7 +16,9 @@ find_package_json() {
   while ! [[ "$root" =~ ^//[^/]*$ ]]; do
     package_json="$root/package.json"
 
-    if [ -f "$package_json" ] && [ -s "$package_json" ]; then
+    if [ -f "$package_json" ] &&
+      [ -r "$package_json" ] &&
+      [ -s "$package_json" ]; then
       echo "$package_json"
       return 0
     fi
