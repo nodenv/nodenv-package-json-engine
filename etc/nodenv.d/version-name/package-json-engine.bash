@@ -5,5 +5,6 @@ fi
 
 if NODENV_PACKAGE_JSON_VERSION=$(nodenv-package-json 2>/dev/null) &&
   [ -n "$NODENV_PACKAGE_JSON_VERSION" ]; then
-  export NODENV_VERSION=$NODENV_PACKAGE_JSON_VERSION
+  # shellcheck disable=2034
+  NODENV_VERSION=$NODENV_PACKAGE_JSON_VERSION
 fi
