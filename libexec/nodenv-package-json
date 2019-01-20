@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 #
+# Usage: nodenv package-json
 # Summary: Show the local application-specific Node version from package.json
-#
-# Usage: nodenv package
 #
 # Shows the highest-installed node version satisfying package.json#engines.
 #
