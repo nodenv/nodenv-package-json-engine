@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# Summary: Show the local application-specific Node version from package.json
+#
+# Usage: nodenv package
+#
+# Shows the highest-installed node version satisfying package.json#engines.
+#
+
+set -e
+[ -n "$NODENV_DEBUG" ] && set -x
+
+abort() {
+  echo "package-json-engine: $1" >&2
+  exit 1
+}
+
+find_package_json() {
+  local package_json root="$1"
+  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
+    package_json="$root/package.json"
+
+    if [ -f "$package_json" ] && [ -s "$package_json" ]; then
+      echo "$package_json"
+      return 0
+    fi
+    [ -n "$root" ] || break
+    root="${root%/*}"
+  done
+  return 1
+}
+
+extract_expression() {
+  version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
+  # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
+  if [[ $(JSON.sh -b -n 2>/dev/null) =~ $version_regex ]]; then
+    echo "${BASH_REMATCH[1]}"
+  else
+    return 1
+  fi
+}
+
+matching_version() {
+  local version_spec=$1
+  local -a installed_versions
+  while IFS= read -r v; do
+    installed_versions+=( "$v" )
+  done < <(nodenv versions --bare --skip-aliases | grep -e '^[[:digit:]]')
+
+  local fast_guess
+  fast_guess=$(semver.sh -r "$version_spec" "${installed_versions[@]:${#installed_versions[@]}-1}" | tail -n 1)
+
+  # Most #engine version specs just specify a baseline version,
+  # which means most likely, the highest installed version will satisfy
+  # This does a first pass with just that single version in hopes it satisfies.
+  # If so, we can avoid the cost of sh-semver sorting and validating across
+  # all the installed versions.
+  if [ -n "$fast_guess" ]; then
+    echo "$fast_guess"
+    return 0
+  fi
+
+  local match
+  match=$(semver.sh -r "$version_spec" "${installed_versions[@]}" | tail -n 1)
+
+  if [ -n "$match" ]; then
+    echo "$match"
+  else
+    return 1
+  fi
+}
+
+if ! package_json="$(find_package_json "$NODENV_DIR")"; then
+  abort "no package.json found for this directory"
+fi
+
+if ! version_spec="$(extract_expression <"$package_json")"; then
+  abort "no engine version configured for this package"
+fi
+
+if ! matching_version "$version_spec"; then
+  abort "no version found satisfying \`$version_spec'"
+fi

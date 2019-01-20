@@ -9,7 +9,7 @@ setup() {
 
   local node_modules_bin=$BATS_TEST_DIRNAME/../node_modules/.bin
 
-  export PATH="$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  export PATH="$BATS_TEST_DIRNAME/../bin:$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   export NODENV_ROOT="$BATS_TEST_DIRNAME/fixtures/nodenv_root"
 
