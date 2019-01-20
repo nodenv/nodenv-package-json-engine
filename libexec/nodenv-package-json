@@ -33,16 +33,6 @@ abs_dirname() {
 
 bin_path="$(abs_dirname "$0")"
 
-extract_expression() {
-  version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
-  # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
-  if [[ $(JSON.sh -b -n 2>/dev/null) =~ $version_regex ]]; then
-    echo "${BASH_REMATCH[1]}"
-  else
-    return 1
-  fi
-}
-
 matching_version() {
   local version_spec=$1
   local -a installed_versions
@@ -78,7 +68,7 @@ if ! NODENV_PACKAGE_JSON_FILE="$("$bin_path/nodenv-package-json-file")"; then
   abort "no package.json found for this directory"
 fi
 
-if ! version_spec="$(extract_expression <"$NODENV_PACKAGE_JSON_FILE")"; then
+if ! version_spec="$("$bin_path/nodenv-package-json-file-read" "$NODENV_PACKAGE_JSON_FILE")"; then
   abort "no engine version configured for this package"
 fi
 
