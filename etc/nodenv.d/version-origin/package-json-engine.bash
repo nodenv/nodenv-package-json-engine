@@ -11,16 +11,18 @@ abs_dirname() {
   local path="$1"
 
   while [ -n "$path" ]; do
-    cd "${path%/*}"
+    cd "${path%/*}" || return 1
     local name="${path##*/}"
     path="$($READLINK "$name" || true)"
   done
 
   pwd
-  cd "$cwd"
+  cd "$cwd" || return 1
 }
 
 bin_path="$(abs_dirname "${BASH_SOURCE[0]}")/../../../libexec"
+
+[ -d "$bin_path" ] || return 1
 
 if NODENV_PACKAGE_JSON_VERSION=$(nodenv-package-json 2>/dev/null) &&
   [ -n "$NODENV_PACKAGE_JSON_VERSION" ]; then
