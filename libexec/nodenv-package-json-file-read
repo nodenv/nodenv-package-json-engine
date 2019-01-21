@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Usage: nodenv package-json-file-read <file>
+#
+# Summary: Show the engines version-spec from package.json
+# Options:
+#   <file>    Package.json file to read from
+#
+
+set -e
+[ -n "$NODENV_DEBUG" ] && set -x
+
+PACKAGE_JSON_FILE=$1
+
+[ -f "$PACKAGE_JSON_FILE" ] || exit 1
+
+extract_expression() {
+  local version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
+  # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
+  if [[ $(JSON.sh -b -n 2>/dev/null) =~ $version_regex ]]; then
+    echo "${BASH_REMATCH[1]}"
+  else
+    return 1
+  fi
+}
+
+extract_expression < "$PACKAGE_JSON_FILE"

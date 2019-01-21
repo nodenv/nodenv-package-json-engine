@@ -1,11 +1,10 @@
-#!/bin/bash
+if [ -n "$(nodenv-sh-shell 2>/dev/null)" ] ||
+  [ -n "$(nodenv-local 2>/dev/null)" ]; then
+  return
+fi
 
-# shellcheck source=libexec/nodenv-package-json-engine
-source "$(plugin_root)/libexec/nodenv-package-json-engine"
-
-if ! NODENV_PACKAGE_JSON_VERSION=$(get_version_respecting_precedence); then
-  echo "package-json-engine: version satisfying \`$(get_expression_respecting_precedence)' not installed" >&2
-  exit 1
-elif [ -n "$NODENV_PACKAGE_JSON_VERSION" ]; then
-  export NODENV_VERSION="${NODENV_PACKAGE_JSON_VERSION}"
+if NODENV_PACKAGE_JSON_VERSION=$(nodenv-package-json 2>/dev/null) &&
+  [ -n "$NODENV_PACKAGE_JSON_VERSION" ]; then
+  # shellcheck disable=2034
+  NODENV_VERSION=$NODENV_PACKAGE_JSON_VERSION
 fi

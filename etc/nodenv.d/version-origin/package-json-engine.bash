@@ -1,9 +1,33 @@
-#!/bin/bash
+if [ -n "$(nodenv-sh-shell 2>/dev/null)" ] ||
+  [ -n "$(nodenv-local 2>/dev/null)" ]; then
+  return
+fi
 
-# shellcheck source=libexec/nodenv-package-json-engine
-source "$(plugin_root)/libexec/nodenv-package-json-engine"
+READLINK=$(type -p greadlink readlink | head -1)
+[ -n "$READLINK" ] || return 1
 
-ENGINES_EXPRESSION=$(get_expression_respecting_precedence);
-if [ -n "$ENGINES_EXPRESSION" ]; then
-  export NODENV_VERSION_ORIGIN="package-json-engine matching $ENGINES_EXPRESSION"
+abs_dirname() {
+  local cwd="$PWD"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}" || return 1
+    local name="${path##*/}"
+    path="$($READLINK "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd" || return 1
+}
+
+bin_path="$(abs_dirname "${BASH_SOURCE[0]}")/../../../libexec"
+
+[ -d "$bin_path" ] || return 1
+
+if NODENV_PACKAGE_JSON_VERSION=$(nodenv-package-json 2>/dev/null) &&
+  [ -n "$NODENV_PACKAGE_JSON_VERSION" ]; then
+  NODENV_PACKAGE_JSON_FILE=$("$bin_path/nodenv-package-json-file")
+  NODENV_PACKAGE_JSON_SPEC=$("$bin_path/nodenv-package-json-file-read" "$NODENV_PACKAGE_JSON_FILE")
+  # shellcheck disable=2034
+  NODENV_VERSION_ORIGIN="satisfying \`$NODENV_PACKAGE_JSON_SPEC' from $NODENV_PACKAGE_JSON_FILE#engines.node"
 fi

@@ -5,11 +5,11 @@ load '../node_modules/bats-assert/load'
 
 setup() {
   # common nodenv setup
-  unset NODENV_VERSION
+  unset NODENV_VERSION NODENV_DIR NODENV_HOOK_PATH
 
   local node_modules_bin=$BATS_TEST_DIRNAME/../node_modules/.bin
 
-  export PATH="$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  export PATH="$BATS_TEST_DIRNAME/../bin:$node_modules_bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   export NODENV_ROOT="$BATS_TEST_DIRNAME/fixtures/nodenv_root"
 
@@ -27,6 +27,7 @@ teardown() {
 
 in_example_package() {
   cd "$EXAMPLE_PACKAGE_DIR" || return 1
+  echo '{}' > package.json
 }
 
 in_package_for_engine() {
@@ -36,21 +37,6 @@ in_package_for_engine() {
   "engines": {
     "node": "$1"
   }
-}
-JSON
-}
-
-in_package_with_babel_env() {
-  in_example_package
-  cat << JSON > package.json
-{
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": "current"
-      }
-    }]
-  ]
 }
 JSON
 }

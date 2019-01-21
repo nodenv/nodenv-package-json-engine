@@ -15,6 +15,7 @@
   "bugs": {
     "url": "https://github.com/nodenv/nodenv-package-json-engine/issues"
   },
+  "bin": "libexec/nodenv-package-json",
   "directories": {
     "bin": "bin",
     "test": "test"
@@ -25,7 +26,7 @@
     "libexec"
   ],
   "scripts": {
-    "lint": "git ls-files bin etc libexec test/*.bash | xargs shellcheck",
+    "lint": "git ls-files etc libexec test/*.bash | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
     "postversion": "npm publish",

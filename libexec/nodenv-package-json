@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+#
+# Usage: nodenv package-json
+# Summary: Show the local application-specific Node version from package.json
+#
+# Shows the highest-installed node version satisfying package.json#engines.
+#
+
+set -e
+[ -n "$NODENV_DEBUG" ] && set -x
+
+abort() {
+  echo "package-json-engine: $1" >&2
+  exit 1
+}
+
+READLINK=$(type -p greadlink readlink | head -1)
+[ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
+
+abs_dirname() {
+  local cwd="$PWD"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$($READLINK "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+bin_path="$(abs_dirname "$0")"
+
+matching_version() {
+  local version_spec=$1
+  local -a installed_versions
+  while IFS= read -r v; do
+    installed_versions+=( "$v" )
+  done < <(nodenv versions --bare --skip-aliases | grep -e '^[[:digit:]]')
+
+  local fast_guess
+  fast_guess=$(semver.sh -r "$version_spec" "${installed_versions[@]:${#installed_versions[@]}-1}" | tail -n 1)
+
+  # Most #engine version specs just specify a baseline version,
+  # which means most likely, the highest installed version will satisfy
+  # This does a first pass with just that single version in hopes it satisfies.
+  # If so, we can avoid the cost of sh-semver sorting and validating across
+  # all the installed versions.
+  if [ -n "$fast_guess" ]; then
+    echo "$fast_guess"
+    return 0
+  fi
+
+  local match
+  match=$(semver.sh -r "$version_spec" "${installed_versions[@]}" | tail -n 1)
+
+  if [ -n "$match" ]; then
+    echo "$match"
+  else
+    return 1
+  fi
+}
+
+
+if ! NODENV_PACKAGE_JSON_FILE="$("$bin_path/nodenv-package-json-file")"; then
+  abort "no package.json found for this directory"
+fi
+
+if ! version_spec="$("$bin_path/nodenv-package-json-file-read" "$NODENV_PACKAGE_JSON_FILE")"; then
+  abort "no engine version configured for this package"
+fi
+
+if ! matching_version "$version_spec"; then
+  abort "no version found satisfying \`$version_spec'"
+fi
