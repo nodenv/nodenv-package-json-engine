@@ -5,7 +5,7 @@ load '../node_modules/bats-assert/load'
 
 setup() {
   # common nodenv setup
-  unset NODENV_VERSION
+  unset NODENV_VERSION NODENV_DIR NODENV_HOOK_PATH
 
   local node_modules_bin=$BATS_TEST_DIRNAME/../node_modules/.bin
 
