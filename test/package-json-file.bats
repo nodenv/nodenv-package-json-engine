@@ -14,7 +14,7 @@ nodenv_package_json_file="$BATS_TEST_DIRNAME/../libexec/nodenv-package-json-file
   assert_output "$EXAMPLE_PACKAGE_DIR/package.json"
 }
 
-@test 'Looks in $NODENV_DIR by default' {
+@test 'Looks in NODENV_DIR by default' {
   in_example_package
   cd ..
 
@@ -24,7 +24,7 @@ nodenv_package_json_file="$BATS_TEST_DIRNAME/../libexec/nodenv-package-json-file
   assert_output "$EXAMPLE_PACKAGE_DIR/package.json"
 }
 
-@test 'Falls back to $PWD' {
+@test 'Falls back to PWD' {
   in_example_package
 
   run "$nodenv_package_json_file"
