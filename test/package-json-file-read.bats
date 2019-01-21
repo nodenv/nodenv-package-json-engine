@@ -15,7 +15,18 @@ read="$BATS_TEST_DIRNAME/../libexec/nodenv-package-json-file-read"
 }
 
 @test 'Does not match arbitrary "node" key in package.json' {
-  in_package_with_babel_env
+  in_example_package
+  cat << JSON > package.json
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
+}
+JSON
 
   run $read package.json
 

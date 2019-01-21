@@ -2,19 +2,19 @@
 
 load test_helper
 
+@test 'Prefers nodenv-shell over package.json' {
+  in_package_for_engine 4.2.1
+
+  NODENV_VERSION=5.0.0 run nodenv version-name
+  assert_success
+  assert_output '5.0.0'
+}
+
 @test 'Prefers nodenv-local over package.json' {
   in_package_for_engine 4.2.1
   nodenv local 5.0.0
 
   run nodenv version-name
-  assert_success
-  assert_output '5.0.0'
-}
-
-@test 'Prefers nodenv-shell over package.json' {
-  in_package_for_engine 4.2.1
-
-  NODENV_VERSION=5.0.0 run nodenv version-name
   assert_success
   assert_output '5.0.0'
 }

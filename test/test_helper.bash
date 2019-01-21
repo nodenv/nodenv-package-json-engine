@@ -40,18 +40,3 @@ in_package_for_engine() {
 }
 JSON
 }
-
-in_package_with_babel_env() {
-  in_example_package
-  cat << JSON > package.json
-{
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": "current"
-      }
-    }]
-  ]
-}
-JSON
-}
