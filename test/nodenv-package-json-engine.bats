@@ -7,7 +7,7 @@ load test_helper
 
   run nodenv version
   assert_success
-  assert_output '4.2.1 (set by package-json-engine matching 4.2.1)'
+  assert_output '4.2.1 => node-x.y.z (set by package-json-engine matching 4.2.1)'
 }
 
 @test 'Prefers the greatest installed version matching a range' {
@@ -15,18 +15,16 @@ load test_helper
 
   run nodenv version
   assert_success
-  assert_output '4.2.1 (set by package-json-engine matching ^4.0.0)'
+  assert_output '4.2.1 => node-x.y.z (set by package-json-engine matching ^4.0.0)'
 }
 
 @test 'Ignores non-matching installed versions' {
   in_package_for_engine '^1.0.0'
 
   run nodenv version
-  # note the command completes successfully
-  assert_success
+  assert_failure
   assert_output - <<-MSG
 package-json-engine: version satisfying \`^1.0.0' not installed
- (set by package-json-engine matching ^1.0.0)
 MSG
 }
 
@@ -36,7 +34,7 @@ MSG
 
   run nodenv version
   assert_success
-  assert_output "5.0.0 (set by $PWD/.node-version)"
+  assert_output "5.0.0 => node-x.y.z (set by $PWD/.node-version)"
 }
 
 @test 'Prefers nodenv-shell over package.json' {
@@ -44,7 +42,7 @@ MSG
 
   NODENV_VERSION=5.0.0 run nodenv version
   assert_success
-  assert_output "5.0.0 (set by NODENV_VERSION environment variable)"
+  assert_output "5.0.0 => node-x.y.z (set by NODENV_VERSION environment variable)"
 }
 
 @test 'Prefers package.json over nodenv-global' {
@@ -62,7 +60,7 @@ MSG
 
   NODENV_VERSION=5.0.0 run nodenv version
   assert_success
-  assert_output "5.0.0 (set by NODENV_VERSION environment variable)"
+  assert_output "5.0.0 => node-x.y.z (set by NODENV_VERSION environment variable)"
 }
 
 @test 'Does not match arbitrary "node" key in package.json' {
