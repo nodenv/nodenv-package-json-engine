@@ -7,7 +7,7 @@ load test_helper
 
   run nodenv version
   assert_success
-  assert_output '4.2.1 => node-x.y.z (set by package-json-engine matching 4.2.1)'
+  assert_output "4.2.1 => node-x.y.z (set by $PWD/package.json#engines.node)"
 }
 
 @test 'Prefers the greatest installed version matching a range' {
@@ -15,7 +15,7 @@ load test_helper
 
   run nodenv version
   assert_success
-  assert_output '4.2.1 => node-x.y.z (set by package-json-engine matching ^4.0.0)'
+  assert_output "4.2.1 => node-x.y.z (set by $PWD/package.json#engines.node)"
 }
 
 @test 'Ignores non-matching installed versions' {
