@@ -14,12 +14,8 @@ SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
 # Gives precedence to local and shell versions.
 # Takes precedence over global version.
 package_json_has_precedence() {
-  if [[ ( -z "$(nodenv local 2>/dev/null)" )
-  && ( -z "$(nodenv sh-shell 2>/dev/null)" ) ]]; then
-    return;
-  else
-    return 1;
-  fi
+  [ -z "$(nodenv local 2>/dev/null)" ] &&
+  [ -z "$(nodenv sh-shell 2>/dev/null)" ]
 }
 
 find_package_json_path() {
@@ -66,11 +62,15 @@ find_installed_version_matching_expression() {
   "$SEMVER" -r "$version_expression" "${installed_versions[@]}" | tail -n 1
 }
 
+package_json_path() {
+  path=$(find_package_json_path "$PWD")
+  [ -r "$path" ] && [ -f "$path" ] && echo "$path"
+}
+
 get_version_respecting_precedence() {
   if ! package_json_has_precedence; then return; fi
 
-  package_json_path=$(find_package_json_path "$PWD")
-  if [ ! -e "$package_json_path" ]; then return; fi
+  package_json_path=$(package_json_path) || return 0
 
   version_expression=$(
     extract_version_from_package_json "$package_json_path"
@@ -87,8 +87,7 @@ get_version_respecting_precedence() {
 get_expression_respecting_precedence() {
   if ! package_json_has_precedence; then return; fi
 
-  package_json_path=$(find_package_json_path "$PWD")
-  if [ ! -e "$package_json_path" ]; then return; fi
+  package_json_path=$(package_json_path) || return 0
 
   version_expression=$(
     extract_version_from_package_json "$package_json_path"
