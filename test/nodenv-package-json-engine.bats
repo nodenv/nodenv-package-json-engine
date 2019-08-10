@@ -24,7 +24,7 @@ load test_helper
   run nodenv version
   assert_failure
   assert_output - <<-MSG
-package-json-engine: version satisfying \`^1.0.0' not installed
+package-json-engine: version satisfying \`^1.0.0' is not installed
 MSG
 }
 
