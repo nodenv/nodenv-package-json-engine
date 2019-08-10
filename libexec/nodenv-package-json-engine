@@ -14,12 +14,8 @@ SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
 # Gives precedence to local and shell versions.
 # Takes precedence over global version.
 package_json_has_precedence() {
-  if [[ ( -z "$(nodenv local 2>/dev/null)" )
-  && ( -z "$(nodenv sh-shell 2>/dev/null)" ) ]]; then
-    return;
-  else
-    return 1;
-  fi
+  [ -z "$(nodenv local 2>/dev/null)" ] &&
+  [ -z "$(nodenv sh-shell 2>/dev/null)" ]
 }
 
 find_package_json_path() {
