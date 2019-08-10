@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # shellcheck source=libexec/nodenv-package-json-engine
 source "$(plugin_root)/libexec/nodenv-package-json-engine"
 
