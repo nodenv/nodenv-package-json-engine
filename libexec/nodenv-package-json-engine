@@ -2,7 +2,7 @@
 #
 # If a custom Node version is not already defined, we look
 # for a Node version semver expressing in the current tree's package.json.
-# If we find a fixed version, we print it out.  If we find a range we
+# If we find a fixed version, we print it out. If we find a range we
 # test the installed versions against that range and print the
 # greatest matching version.
 
