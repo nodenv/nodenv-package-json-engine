@@ -1,11 +1,13 @@
 # nodenv-package-json-engine
 
+[![Latest GitHub Release](https://img.shields.io/github/v/release/nodenv/nodenv-package-json-engine?logo=github&sort=semver)](https://github.com/nodenv/nodenv-package-json-engine/releases/latest)
+[![Latest npm Release](https://img.shields.io/npm/v/@nodenv/nodenv-package-json-engine)](https://www.npmjs.com/package/@nodenv/nodenv-package-json-engine/v/latest)
+[![Test](https://img.shields.io/github/workflow/status/nodenv/nodenv-package-json-engine/Test?label=tests&logo=github)](https://github.com/nodenv/nodenv-package-json-engine/actions?query=workflow%3ATest)
+
 This is a plugin for [nodenv](https://github.com/nodenv/nodenv)
 that detects the Node version based on the [`engines`](https://docs.npmjs.com/files/package.json#engines) field of the current tree's `package.json` file. The `$NODENV_VERSION` environment variable (set with `nodenv shell`) and `.node-version` files still take precedence.
 
 When `engines` is configured with a range this plugin chooses the greatest installed version matching the range, or exits with an error if none match.
-
-[![Build Status](https://travis-ci.org/nodenv/nodenv-package-json-engine.svg?branch=master)](https://travis-ci.org/nodenv/nodenv-package-json-engine)
 
 <!-- toc -->
 
