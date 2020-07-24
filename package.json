@@ -28,10 +28,7 @@
     "lint": "git ls-files bin etc libexec test/*.bash | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
-    "postversion": "npm publish",
-    "prepublishOnly": "npm run publish:github && npm run publish:brew",
-    "publish:brew": "brew-publish",
-    "publish:github": "git push --follow-tags"
+    "postversion": "git push --follow-tags"
   },
   "devDependencies": {
     "@nodenv/devutil": "0.0.2",
@@ -39,7 +36,6 @@
     "bats": "^1.1.0",
     "bats-assert": "jasonkarns/bats-assert-1",
     "bats-support": "jasonkarns/bats-support",
-    "brew-publish": "^2.3.1",
     "shellcheck": "^0.4.4"
   },
   "dependencies": {
