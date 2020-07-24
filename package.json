@@ -28,6 +28,7 @@
     "lint": "git ls-files bin etc libexec test/*.bash | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
+    "changelog": "changelog bin etc libexec",
     "postversion": "git push --follow-tags"
   },
   "devDependencies": {
