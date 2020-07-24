@@ -1,0 +1,32 @@
+name: Release
+on: { push: { tags: 'v[0-9]+.[0-9]+.[0-9]+' } }
+
+jobs:
+  github:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with: { fetch-depth: 0 }
+      - run: npm run changelog | tee relnotes.txt
+      - uses: jasonkarns/create-release@master
+        with: { body_file: relnotes.txt }
+
+  homebrew:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mislav/bump-homebrew-formula-action@v1
+        with: { formula-name: nodenv }
+        env:
+          COMMITTER_TOKEN: ${{ secrets.BREWTAP_TOKEN }}
+
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          scope: nodenv
+          registry-url: https://registry.npmjs.org
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
