@@ -28,8 +28,8 @@
     "lint": "git ls-files bin etc libexec test/*.bash | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
-    "changelog": "changelog -- bin etc libexec",
-    "postversion": "git push --follow-tags"
+    "postversion": "git push --follow-tags",
+    "relnotes": "changelog -- bin etc libexec"
   },
   "devDependencies": {
     "@nodenv/devutil": "^0.1.1",
