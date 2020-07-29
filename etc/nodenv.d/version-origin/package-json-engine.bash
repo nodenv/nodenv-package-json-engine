@@ -6,3 +6,4 @@ if [ -n "$ENGINES_EXPRESSION" ]; then
   # shellcheck disable=2034
   NODENV_VERSION_ORIGIN="$(package_json_path)#engines.node"
 fi
+unset ENGINES_EXPRESSION
