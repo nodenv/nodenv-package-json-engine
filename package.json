@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@nodenv/devutil": "^0.1.1",
-    "@nodenv/nodenv": "^1.4.1",
+    "@nodenv/nodenv": "^1.5.0",
     "bats": "^1.11.0",
     "bats-assert": "jasonkarns/bats-assert-1",
     "bats-support": "jasonkarns/bats-support",
