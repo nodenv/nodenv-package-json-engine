@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with: { egress-policy: audit }
-      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with: { fetch-depth: 0 }
       - run: npm run -s relnotes | tee relnotes.txt
       - uses: jasonkarns/create-release@9249b73e127bea00eb6f2caa7244657983df0557 # master
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with: { egress-policy: audit }
-      - uses: mislav/bump-homebrew-formula-action@21991dc8f899341b552c9842957677139a340980 # v1.16
+      - uses: mislav/bump-homebrew-formula-action@8e2baa47daaa8db10fcdeb04105dfa6850eb0d68 # v3.4
         with: { formula-name: nodenv }
         env:
           COMMITTER_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -28,8 +28,8 @@ jobs:
     steps:
       - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with: { egress-policy: audit }
-      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
-      - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e # v1.4.6
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           scope: nodenv
           registry-url: https://registry.npmjs.org
