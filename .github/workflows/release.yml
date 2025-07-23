@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with: { egress-policy: audit }
-      - uses: mislav/bump-homebrew-formula-action@21991dc8f899341b552c9842957677139a340980 # v1.16
+      - uses: mislav/bump-homebrew-formula-action@8e2baa47daaa8db10fcdeb04105dfa6850eb0d68 # v3.4
         with: { formula-name: nodenv }
         env:
           COMMITTER_TOKEN: ${{ secrets.BOT_TOKEN }}
