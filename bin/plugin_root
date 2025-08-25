@@ -11,7 +11,7 @@ src="${BASH_SOURCE[0]}"
 # while $src is a symlink, resolve it
 while [ -h "$src" ]; do
   dir="${src%/*}"
-  src="$( readlink "$src" )"
+  src="$(readlink "$src")"
 
   # If $src was a relative symlink (so no "/" as prefix),
   # need to resolve it relative to the symlink base directory

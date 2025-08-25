@@ -15,7 +15,7 @@ SEMVER="$(plugin_root)/node_modules/sh-semver/semver.sh"
 # Takes precedence over global version.
 package_json_has_precedence() {
   [ -z "$(nodenv local 2>/dev/null)" ] &&
-  [ -z "$(nodenv sh-shell 2>/dev/null)" ]
+    [ -z "$(nodenv sh-shell 2>/dev/null)" ]
 }
 
 find_package_json_path() {
@@ -35,7 +35,7 @@ extract_version_from_package_json() {
   package_json_path="${1-}"
   version_regex='\["engines","node"\][[:space:]]*"([^"]*)"'
   # -b -n gives minimal output - see https://github.com/dominictarr/JSON.sh#options
-  [[ $("$JSON_SH" -b -n < "$package_json_path" 2>/dev/null) =~ $version_regex ]]
+  [[ $("$JSON_SH" -b -n <"$package_json_path" 2>/dev/null) =~ $version_regex ]]
   echo "${BASH_REMATCH[1]-}"
 }
 
@@ -43,7 +43,7 @@ find_installed_version_matching_expression() {
   version_expression="${1-}"
   local -a installed_versions
   while IFS= read -r v; do
-    installed_versions+=( "$v" )
+    installed_versions+=("$v")
   done < <(nodenv versions --bare --skip-aliases | grep -e '^[[:digit:]]')
 
   local fast_guess
