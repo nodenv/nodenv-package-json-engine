@@ -6,7 +6,7 @@
   "license": "MIT",
   "author": "Adam Hull (http://hurrymaplelad.com)",
   "contributors": [
-    "Jason Karns <jason@karns.name> (http://jason.karns.name)"
+    "Jason Karns <jason.karns@gmail.com> (http://jasonkarns.com)"
   ],
   "repository": {
     "type": "git",
@@ -25,9 +25,9 @@
     "libexec"
   ],
   "scripts": {
-    "lint": "git ls-files bin etc libexec test/*.bash | grep -Ev '(semver|JSON).sh' | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
+    "lint": "git ls-files bin etc libexec test/*.bash | grep -Ev '(semver|JSON).sh' | xargs shellcheck",
     "postversion": "git push --follow-tags"
   },
   "devDependencies": {
