@@ -1,38 +1,10 @@
 name: Release
-on: { push: { tags: 'v[0-9]+.[0-9]+.[0-9]+' } }
+on:
+  push: { tags: "v[0-9]+.[0-9]+.[0-9]+*" }
 
+permissions: {}
 jobs:
-  github:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
-        with: { egress-policy: audit }
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with: { fetch-depth: 0 }
-      - run: npm run -s relnotes | tee relnotes.txt
-      - uses: jasonkarns/create-release@9249b73e127bea00eb6f2caa7244657983df0557 # master
-        with: { body_path: relnotes.txt }
-
-  homebrew:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
-        with: { egress-policy: audit }
-      - uses: mislav/bump-homebrew-formula-action@37c544ffe02cc3f4eb1987db8fa63c96e0b37098 # v3.5
-        with: { formula-name: nodenv }
-        env:
-          COMMITTER_TOKEN: ${{ secrets.BOT_TOKEN }}
-
-  npm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
-        with: { egress-policy: audit }
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          scope: nodenv
-          registry-url: https://registry.npmjs.org
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
+  release:
+    permissions: { contents: write, id-token: write }
+    uses: nodenv/.github/.github/workflows/release.yml@v6
+    secrets: inherit
