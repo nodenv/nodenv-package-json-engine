@@ -12,8 +12,8 @@ When `engines` is configured with a range this plugin chooses the greatest insta
 <!-- toc -->
 
 - [Installation](#installation)
-  * [Installing with Git](#installing-with-git)
-  * [Installing with Homebrew](#installing-with-homebrew)
+  - [Installing with Git](#installing-with-git)
+  - [Installing with Homebrew](#installing-with-homebrew)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Credits](#credits)
@@ -32,8 +32,8 @@ $ git clone https://github.com/nodenv/nodenv-package-json-engine.git $(nodenv ro
 
 Mac OS X users can install [many nodenv plugins](https://github.com/nodenv/homebrew-nodenv) with [Homebrew](http://brew.sh).
 
-*This is the recommended method of installation if you installed nodenv with
-Homebrew.*
+_This is the recommended method of installation if you installed nodenv with
+Homebrew._
 
 ```sh
 $ brew tap nodenv/nodenv
@@ -42,7 +42,7 @@ $ brew install nodenv-package-json-engine
 
 ## Usage
 
-Once you've installed the plugin you can verify that it's working by `cd`ing into a project that has a `package.json` file with `engines` and does not have a `.node-version` file.  From anywhere in the project's tree, run `nodenv which node`.
+Once you've installed the plugin you can verify that it's working by `cd`ing into a project that has a `package.json` file with `engines` and does not have a `.node-version` file. From anywhere in the project's tree, run `nodenv which node`.
 
 ## Contributing
 
