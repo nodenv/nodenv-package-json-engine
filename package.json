@@ -28,8 +28,7 @@
     "lint": "git ls-files bin etc libexec test/*.bash | grep -Ev '(semver|JSON).sh' | xargs shellcheck",
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
-    "postversion": "git push --follow-tags",
-    "relnotes": "changelog -- bin etc libexec"
+    "postversion": "git push --follow-tags"
   },
   "devDependencies": {
     "@nodenv/devutil": "^0.1.1",
