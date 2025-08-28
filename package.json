@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodenv/nodenv-package-json-engine.git"
+    "url": "git+https://github.com/nodenv/nodenv-package-json-engine.git"
   },
   "bugs": {
     "url": "https://github.com/nodenv/nodenv-package-json-engine/issues"
@@ -41,6 +41,6 @@
   },
   "dependencies": {
     "JSON.sh": "~0.3.3",
-    "sh-semver": "qzb/sh-semver"
+    "sh-semver": "github:qzb/sh-semver"
   }
 }
