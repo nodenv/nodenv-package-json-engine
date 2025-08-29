@@ -1,10 +1,13 @@
 # nodenv-package-json-engine
 
-[![Latest GitHub Release](https://img.shields.io/github/v/release/nodenv/nodenv-package-json-engine?logo=github&sort=semver)](https://github.com/nodenv/nodenv-package-json-engine/releases/latest)
-[![Latest npm Release](https://img.shields.io/npm/v/@nodenv/nodenv-package-json-engine)](https://www.npmjs.com/package/@nodenv/nodenv-package-json-engine/v/latest)
-[![Test](https://img.shields.io/github/workflow/status/nodenv/nodenv-package-json-engine/Test?label=tests&logo=github)](https://github.com/nodenv/nodenv-package-json-engine/actions?query=workflow%3ATest)
+[nodenv][] plugin to respect `package.json#engines.node` in the absence of `.node-version`
 
-This is a plugin for [nodenv](https://github.com/nodenv/nodenv) that detects
+[![Tests](https://img.shields.io/github/actions/workflow/status/nodenv/nodenv-package-json-engine/test.yml?label=tests&logo=github)](https://github.com/nodenv/nodenv-package-json-engine/actions/workflows/test.yml)
+[![Latest GitHub Release](https://img.shields.io/github/v/release/nodenv/nodenv-package-json-engine?label=github&logo=github&sort=semver)](https://github.com/nodenv/nodenv-package-json-engine/releases/latest)
+[![Latest Homebrew Release](<https://img.shields.io/badge/dynamic/regex?label=homebrew-nodenv&logo=homebrew&logoColor=white&url=https%3A%2F%2Fraw.githubusercontent.com%2Fnodenv%2Fhomebrew-nodenv%2Frefs%2Fheads%2Fmain%2FFormula%2Fnodenv-package-json-engine.rb&search=archive%2Frefs%2Ftags%2Fv(%3F%3Cversion%3E%5Cd%2B.*).tar.gz&replace=v%24%3Cversion%3E>)](https://github.com/nodenv/homebrew-nodenv/blob/main/Formula/nodenv-package-json-engine.rb)
+[![Latest npm Release](https://img.shields.io/npm/v/@nodenv/nodenv-package-json-engine?logo=npm&logoColor=white)](https://www.npmjs.com/package/@nodenv/nodenv-package-json-engine/v/latest)
+
+This is a plugin for [nodenv][] that detects
 the Node.js version based on the
 [`engines`](https://docs.npmjs.com/files/package.json#engines) field of the
 current tree's `package.json` file. The `$NODENV_VERSION` environment variable
@@ -67,3 +70,5 @@ node`.
 Shell SemVer range support provided by [sh-semver](https://github.com/qzb/sh-semver).
 
 `package.json` parsing provided by [JSON.sh](https://github.com/dominictarr/JSON.sh).
+
+[nodenv]: https://github.com/nodenv/nodenv
