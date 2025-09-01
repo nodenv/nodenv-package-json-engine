@@ -1,6 +1,6 @@
 # nodenv-package-json-engine
 
-[nodenv][] plugin to respect `package.json#engines.node` in the absence of `.node-version`
+A [nodenv][] plugin to activate Node version from the `package.json#engines.node` field.
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/nodenv/nodenv-package-json-engine/test.yml?label=tests&logo=github)](https://github.com/nodenv/nodenv-package-json-engine/actions/workflows/test.yml)
 [![Latest GitHub Release](https://img.shields.io/github/v/release/nodenv/nodenv-package-json-engine?label=github&logo=github&sort=semver)](https://github.com/nodenv/nodenv-package-json-engine/releases/latest)

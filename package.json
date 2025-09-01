@@ -1,7 +1,7 @@
 {
   "name": "@nodenv/nodenv-package-json-engine",
   "version": "3.0.3",
-  "description": "Activate a nodenv node version from package.json engines",
+  "description": "A nodenv plugin to activate Node version from the package.json#engines.node field.",
   "homepage": "https://github.com/nodenv/nodenv-package-json-engine#readme",
   "license": "MIT",
   "author": "Adam Hull (http://hurrymaplelad.com)",
