@@ -32,12 +32,12 @@
     "postversion": "git push --follow-tags"
   },
   "devDependencies": {
-    "@nodenv/nodenv": "^1.6.2",
-    "bats": "^1.13.0",
-    "bats-assert": "^2.2.4",
+    "@nodenv/nodenv": "1",
+    "bats": "1",
+    "bats-assert": "2",
     "bats-support": "^0.3.0",
-    "prettier": "^3.7.3",
-    "shellcheck": "^4.1.0"
+    "prettier": "3",
+    "shellcheck": "4"
   },
   "dependencies": {
     "JSON.sh": "~0.3.3",
