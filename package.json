@@ -31,6 +31,10 @@
     "postlint": "prettier --check .",
     "postversion": "git push --follow-tags"
   },
+  "dependencies": {
+    "JSON.sh": "~0.3.3",
+    "sh-semver": "github:qzb/sh-semver"
+  },
   "devDependencies": {
     "@nodenv/nodenv": "1",
     "bats": "1",
@@ -38,9 +42,5 @@
     "bats-support": "^0.3.0",
     "prettier": "3",
     "shellcheck": "4"
-  },
-  "dependencies": {
-    "JSON.sh": "~0.3.3",
-    "sh-semver": "github:qzb/sh-semver"
   }
 }
