@@ -27,7 +27,7 @@
   "scripts": {
     "test": "bats ${CI:+--tap} test",
     "posttest": "npm run lint",
-    "lint": "git ls-files bin etc libexec test/*.bash | grep -Ev '(semver|JSON).sh' | xargs shellcheck",
+    "lint": "git ls-files bin etc libexec test */*.*sh | grep -Ev '(semver|JSON|fixtures)' | xargs shellcheck",
     "postlint": "prettier --check .",
     "postversion": "git push --follow-tags"
   },
