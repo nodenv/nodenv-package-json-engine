@@ -84,7 +84,7 @@ MSG
 @test 'Does not fail with unreadable package.json' {
   in_example_package
   touch package.json
-  chmod -r package.json
+  chmod a-r package.json
 
   run nodenv version-name
 
