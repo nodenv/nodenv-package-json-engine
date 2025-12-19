@@ -31,7 +31,7 @@ in_example_package() {
 
 in_package_for_engine() {
   in_example_package
-  cat << JSON > package.json
+  cat <<JSON >package.json
 {
   "engines": {
     "node": "$1"
@@ -42,7 +42,7 @@ JSON
 
 in_package_with_babel_env() {
   in_example_package
-  cat << JSON > package.json
+  cat <<JSON >package.json
 {
   "presets": [
     ["env", {

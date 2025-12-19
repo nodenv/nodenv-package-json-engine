@@ -112,13 +112,13 @@ MSG
   assert_output 'system'
 
   # non json
-  echo "foo" > package.json
+  echo "foo" >package.json
   run nodenv version-name
   assert_success
   assert_output 'system'
 
   # malformed
-  echo "{" > package.json
+  echo "{" >package.json
   run nodenv version-name
   assert_success
   assert_output 'system'
@@ -126,7 +126,7 @@ MSG
 
 @test 'Handles multiple occurrences of "node" key' {
   in_example_package
-  cat << JSON > package.json
+  cat <<JSON >package.json
 {
   "engines": {
     "node": "4.2.1"
